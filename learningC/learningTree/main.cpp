@@ -420,15 +420,39 @@ bool IsContinuous(vector<int> numbers) {
 	return false;
 }
 
+bool Find(int target, vector<vector<int> > array) {
+	int  i, j;
+	for (i = 0, j = array[0].size() - 1; i < array.size()&& j >= 0;)
+	{
+		if (array[i][j]==target)
+		{
+			return true;
+		}
+		 else if (array[i][j]>target)
+		{
+			j--;
+		}
+		 else
+		{
+			 i++;
+		}
+	}
+	return false;
+}
+
 int main() 
 {
-	vector<vector<int>> vecIntS;
+	vector<vector<int>> vecIntS = { 
+    { 1,2,8,9 } ,
+	{ 2,4,9,12 },
+	{ 4,7,10,13 },
+	{ 6,8,11,15 } };
 	vector<int> vec = { 0,0,1,2,3 };
 	vector<int> vec1 = { 0,0,1,2,3 ,4,5,6,3,3,22,3,5,5,6,65,5,22};
 	sort(vec1.begin(), vec1.end());
-	bool t = IsContinuous(vec);
+	bool t = Find(7,vecIntS);
 	cout << t << endl;
-	coutVec1d(vec1);
+	//coutVec1d(vec1);
 	system("pause");
 	return 0;
 }
