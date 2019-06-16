@@ -51,6 +51,14 @@ public:
 };
 
 
+  struct ListNode {
+        int val;
+        struct ListNode *next;
+        ListNode(int x) :
+              val(x), next(NULL) {
+        }
+  };
+
 
 struct TreeNode {
 	int val;
@@ -438,6 +446,73 @@ bool Find(int target, vector<vector<int> > array) {
 		}
 	}
 	return false;
+}
+
+void replaceSpace(char *str, int length) {
+	if (str == NULL)
+		return;
+	int blanks = 0;
+	int originlen = 0;
+	for (int i = 0;str[i] != '\0';i++)
+	{
+		originlen++;
+		if (str[i]==' ')
+		{
+			blanks++;
+		}
+	}
+	int len = originlen + 2 * blanks;
+	if (len+1>length)
+	{
+		return;
+	}
+
+	char*pStr1 = str + originlen;
+	char*pStr2 = str + len;
+
+	while (pStr1<pStr2)
+	{
+		if (*pStr1==' ')
+		{
+			*pStr2-- = '0';
+			*pStr2-- = '2';
+			*pStr2-- = '%';
+		}
+		else 
+		{
+			*pStr2-- = *pStr1;
+		}
+		pStr1--;
+	}
+}
+
+vector<int> printListFromTailToHead(ListNode* head) {
+	vector<int> vec;
+	while (head!=NULL)
+	{
+		vec.push_back(head->val);
+		head = head->next;
+	}
+	reverse(vec.begin(), vec.end());
+	return vec;
+}
+
+TreeNode* R(vector<int> a, int abegin, int aend, vector<int> b, int bbegin, int bend)
+{
+	if (abegin >= aend || bbegin >= bend)
+		return NULL;
+	TreeNode* root = new TreeNode(a[abegin]);
+	int pivot;
+	for (pivot = bbegin; pivot < bend; pivot++)
+		if (b[pivot] == a[abegin])
+			break;
+	root->left = R(a, abegin + 1, abegin + pivot - bbegin + 1, b, bbegin, pivot);
+	root->right = R(a, abegin + pivot - bbegin + 1, aend, b, pivot + 1, bend);
+	return root;
+}
+
+TreeNode* reConstructBinaryTree(vector<int> pre, vector<int> vin) {
+	return R(pre, 0, pre.size(), vin, 0, vin.size());
 }
 
 int main() 
