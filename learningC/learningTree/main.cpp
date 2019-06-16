@@ -515,6 +515,46 @@ TreeNode* reConstructBinaryTree(vector<int> pre, vector<int> vin) {
 	return R(pre, 0, pre.size(), vin, 0, vin.size());
 }
 
+int minNumberInRotateArray(vector<int> rotateArray) {
+	if (rotateArray.size()==0)
+	{
+		return 0;
+	}
+	int temp = 0;
+	for (temp =0; temp<rotateArray.size()-1; temp++)
+	{
+		if (rotateArray[temp]>rotateArray[temp+1])
+		{
+			break;
+		}
+	}
+	reverse(rotateArray.begin(), rotateArray.begin() + temp + 1);
+	reverse(rotateArray.begin() + temp + 1, rotateArray.end());
+	reverse(rotateArray.begin(), rotateArray.end());
+	return rotateArray[0];
+}
+
+int Fibonacci(int n) {
+	if (n == 0)
+		return 0;
+
+	if (n == 1)
+		return 1;
+	int first = 0;
+	int second = 1;
+	int result = 0;
+	n -= 2;
+	while (n >= 0)
+	{
+		result = first + second;
+		first = second;
+		second = result;
+		n--;
+	}
+
+	return result;
+}
+
 int main() 
 {
 	vector<vector<int>> vecIntS = { 
