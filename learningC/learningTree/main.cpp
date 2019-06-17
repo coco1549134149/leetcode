@@ -555,6 +555,51 @@ int Fibonacci(int n) {
 	return result;
 }
 
+int LastRemaining_Solution(int n, int m)
+{
+	vector<int> vec;
+	for (int i = 0; i < n; i++) 
+	{
+		vec.push_back(i);
+	}
+	int iter = 0;
+	while (n > 1)
+	{
+		int index = m%n-1;
+		if (index < 0)
+			index += n;
+		int size = vec.size();
+		if ((iter+index)>=size)
+		{
+			iter = index- (size - iter);
+		}
+		else 
+		{
+			iter = iter + index;
+		}
+		//if (iter == -1)  iter = 0;
+		vec.erase(vec.begin() + iter);
+		n--;
+	}
+	return vec[0];
+}
+
+int LastRemaining_SolutionV2(int n, int m)
+{
+	if (n == 0) return -1;
+	int s = 0;
+	for (int i = 2; i <= n; i++) {
+		s = (s + m) % i;
+	}
+	return s;
+}
+
+int Sum_Solution(int n) {
+	int ans = n;
+	bool b= (n > 0) && ((ans += Sum_Solution(n-1))>0);
+	return ans;
+}
+
 int main() 
 {
 	vector<vector<int>> vecIntS = { 
@@ -564,8 +609,8 @@ int main()
 	{ 6,8,11,15 } };
 	vector<int> vec = { 0,0,1,2,3 };
 	vector<int> vec1 = { 0,0,1,2,3 ,4,5,6,3,3,22,3,5,5,6,65,5,22};
-	sort(vec1.begin(), vec1.end());
-	bool t = Find(7,vecIntS);
+	//sort(vec1.begin(), vec1.end());
+	int t = Sum_Solution(8);
 	cout << t << endl;
 	//coutVec1d(vec1);
 	system("pause");
