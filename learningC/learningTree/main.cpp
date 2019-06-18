@@ -535,6 +535,7 @@ int minNumberInRotateArray(vector<int> rotateArray) {
 }
 
 int Fibonacci(int n) {
+
 	if (n == 0)
 		return 0;
 
@@ -555,6 +556,209 @@ int Fibonacci(int n) {
 	return result;
 }
 
+int LastRemaining_Solution(int n, int m)
+{
+	vector<int> vec;
+	for (int i = 0; i < n; i++) 
+	{
+		vec.push_back(i);
+	}
+	int iter = 0;
+	while (n > 1)
+	{
+		int index = m%n-1;
+		if (index < 0)
+			index += n;
+		int size = vec.size();
+		if ((iter+index)>=size)
+		{
+			iter = index- (size - iter);
+		}
+		else 
+		{
+			iter = iter + index;
+		}
+		//if (iter == -1)  iter = 0;
+		vec.erase(vec.begin() + iter);
+		n--;
+	}
+	return vec[0];
+}
+
+int LastRemaining_SolutionV2(int n, int m)
+{
+	if (n == 0) return -1;
+	int s = 0;
+	for (int i = 2; i <= n; i++) {
+		s = (s + m) % i;
+	}
+	return s;
+}
+
+int Sum_Solution(int n) {
+	int ans = n;
+	bool b= (n > 0) && ((ans += Sum_Solution(n-1))>0);
+	return ans;
+}
+
+int jumpFloor(int number) {
+	if (number == 0||number==1) return 1;
+
+	return jumpFloor(number - 1) + jumpFloor(number - 2);
+	
+}
+
+int jumpFloorII(int number) {
+	if (number == 0 || number == 1) return 1;
+	int num = 0;
+	for (int i=1;i<=number;i++) 
+	{
+		num += jumpFloorII(number - i);
+	}
+	return num;
+
+}
+
+int rectCover(int n) {
+
+	if (n == 0) return 0;
+	if (n == 1) return 1;
+	int f = 1;
+	int s = 2;
+	int res = 2;
+	n -= 2;
+	while (n > 0)
+	{
+		res = f + s;
+		f = s;
+		s = res;
+		n--;
+	}
+	return res;
+
+}
+
+int Add(int a, int b)
+{
+	if (b == 0)
+		return a;
+	int sum, ret;
+	sum = a^b;
+	ret = (a & b) << 1;
+	return Add(sum, ret);
+}
+
+int  NumberOf1(int n) {
+	int count = 0;
+	while (n!=0)
+	{
+		n = (n - 1)&n;
+		count++;
+	}
+	return count;
+}
+
+double Power(double base, int exponent) {
+	double res = 1;
+	int n;
+	if (exponent == 0) return 1;
+	if (exponent > 0)
+	{
+		n = 1;
+	}
+	else
+	{
+		exponent = -exponent;
+		n = -1;
+		if (base==0)
+		{
+			return 0;
+		}
+	}
+	// v1
+	//while (exponent!=0)
+	//{
+	//	if (exponent&1)
+	//	{
+	//		res *= base;
+	//	}
+	//	base *= base;
+	//	exponent >>= 1;
+	//}
+
+
+//v2
+	while (exponent!=0)
+	{
+		res *= base;
+		exponent--;
+	}
+	return n > 0 ? res : (1 / res);
+}
+
+
+void reOrderArray(vector<int> &array) {
+	vector<int> vec;
+	int last = 0;
+	for (int i = 0; i < array.size(); i++) 
+	{
+		if (array[i]%2==1)
+		{
+			array[last] = array[i];
+			last++;
+			
+		}
+		else
+		{
+			vec.push_back(array[i]);
+		}
+	}
+
+	for (int i=0;i<vec.size();i++)
+	{
+		array[last] = vec[i];
+		last++;
+	}
+}
+
+ListNode* FindKthToTail(ListNode* pListHead, unsigned int k) {
+	queue<ListNode*> q;
+	while (pListHead!=NULL)
+	{
+		if (q.size() != k)
+		{
+			q.push(pListHead);
+		}
+		else 
+		{
+			q.pop();
+			q.push(pListHead);
+		}
+		pListHead = pListHead->next;
+	}
+	
+	if (q.size()<k)
+	{
+		return NULL;
+	}
+	
+	return q.front();
+}
+
+ListNode* ReverseList(ListNode* pHead) {
+	if (pHead == NULL)  return pHead;
+	ListNode* prev = NULL;
+	ListNode *next = NULL;
+	while (pHead)
+	{
+		next = pHead->next;
+		pHead->next = prev;
+		prev = pHead;
+		pHead = next;
+	}
+	return prev;
+}
+
 int main() 
 {
 	vector<vector<int>> vecIntS = { 
@@ -562,12 +766,13 @@ int main()
 	{ 2,4,9,12 },
 	{ 4,7,10,13 },
 	{ 6,8,11,15 } };
-	vector<int> vec = { 0,0,1,2,3 };
+	vector<int> vec = { 1,2,3,4,5,6,7 };
 	vector<int> vec1 = { 0,0,1,2,3 ,4,5,6,3,3,22,3,5,5,6,65,5,22};
-	sort(vec1.begin(), vec1.end());
-	bool t = Find(7,vecIntS);
-	cout << t << endl;
-	//coutVec1d(vec1);
+	//sort(vec1.begin(), vec1.end());
+	//int t = rectCover(3);
+	//cout << t << endl;
+	reOrderArray(vec);
+	coutVec1d(vec);
 	system("pause");
 	return 0;
 }
