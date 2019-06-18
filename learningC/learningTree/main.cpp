@@ -758,7 +758,6 @@ ListNode* ReverseList(ListNode* pHead) {
 	}
 	return prev;
 }
-}
 
 int main() 
 {
