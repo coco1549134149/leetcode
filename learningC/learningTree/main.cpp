@@ -68,6 +68,15 @@ struct TreeNode {
 
 };
 
+
+struct RandomListNode {
+	int label;
+	struct RandomListNode *next, *random;
+	RandomListNode(int x) :
+		label(x), next(NULL), random(NULL) {
+	}
+};
+
 void postorderV2(vector<int>& num, Node* node) 
 {
 	if (node == NULL)
@@ -758,21 +767,365 @@ ListNode* ReverseList(ListNode* pHead) {
 	}
 	return prev;
 }
+//////////////////////////////////////////////////////////////////////////////
+ListNode* Merge(ListNode* pHead1, ListNode* pHead2)
+{
+	if (pHead1 == NULL)
+		return pHead2;
+	if (pHead2 == NULL)
+		return pHead1;
+	ListNode* head = pHead1;
+	if (pHead1->val>pHead2->val)
+	{
+		int temp = pHead2->val;
+		pHead2->val = pHead1->val;
+		pHead1->val = temp;
+	}
+	while (pHead2!=NULL&&pHead1!=NULL)
+	{
+		ListNode* next = pHead1->next;
+		if (next==NULL)
+		{
+			if (pHead2->val >= pHead1->val)
+			{
+				pHead1->next = pHead2;
+				//pHead2 = pHead2->next;
+				break;
+			}
+		}
+		else 
+		{
+			if (pHead2->val >= pHead1->val&&pHead2->val<=next->val)
+			{
+				pHead1->next = pHead2;
+				pHead2 = pHead2->next;
+				pHead1->next->next = next;
+			}
+		}
+		pHead1 = pHead1->next;
+	}
+	if (pHead2!=NULL)
+	{
+		pHead1->next = pHead2;
+	}
+	return head;
+}
+/////////////////////////////////////////////////////////////////////////
+bool isSubtree(TreeNode* pRoot1, TreeNode* pRoot2)
+{
+	if (pRoot2 == NULL) return true;
+	if (pRoot1 == NULL) return false;
+	if (pRoot1->val == pRoot2->val)
+		return isSubtree(pRoot1->left, pRoot2->left) && isSubtree(pRoot1->right, pRoot2->right);
+	else
+		return false;
+}
+
+bool HasSubtree(TreeNode* pRoot1, TreeNode* pRoot2)
+{
+	if (pRoot2 == NULL||pRoot1==NULL)  return false;
+	return isSubtree(pRoot1, pRoot2) || HasSubtree(pRoot1->left, pRoot2) || HasSubtree(pRoot1->right, pRoot2);
+}
+//////////////////////////////////////////////////////////////////////////
+void Mirror(TreeNode *pRoot) {
+	if (!pRoot) return;
+	TreeNode* temp = pRoot->left;
+	pRoot->left = pRoot->right;
+	pRoot->right = temp;
+	if (pRoot->left) Mirror(pRoot->left);
+	if (pRoot->right) Mirror(pRoot->right);
+}
+//////////////////////////////////////////////////////////////////////////////////////
+void circleMatrix(vector<vector<int>>& matrix, vector<int>& vec,int leftI,int LeftJ,int rightI,int rightJ) 
+{
+	vec.push_back(matrix[leftI][LeftJ]);
+    if (leftI==rightI&&LeftJ==rightJ)
+		return;
+	int i, j;
+	if (LeftJ==rightJ)
+	{
+		for (j = LeftJ,i = leftI+1; i <= rightI;i++)
+		{
+			vec.push_back(matrix[i][j]);
+		}
+		return;
+	}
+	if (leftI == rightI)
+	{
+		for (i = leftI,j = LeftJ+1; j <= rightJ; j++)
+		{
+			vec.push_back(matrix[i][j]);
+		}
+		return;
+	}
+
+	bool f=true;
+	bool r = true;
+	j = LeftJ + 1;
+	if (j == rightJ) f = false;
+	for (i = leftI;i!=leftI||j!=LeftJ;)
+	{
+		
+		vec.push_back(matrix[i][j]);
+
+		if (r)
+		{
+			if (f)
+			{
+				j++;
+				if (j == rightJ) f = false;
+			}
+			else
+			{
+				i++;
+				if (i == rightI) f = true;
+			}
+
+			if (j == rightJ&&i == rightI)
+			{
+				r = false;
+			}
+		}
+		else 
+		{
+			if (f)
+			{
+				j--;
+				if (j == LeftJ) f = false;
+			}
+			else
+			{
+				i--;
+				if (i == leftI) f = true;
+			}
+		}
+	}
+}
+
+vector<int> printMatrix(vector<vector<int> > matrix) {
+	vector<int> vec;
+	int w, h,i,j;
+	w = matrix[0].size()-1;
+	h = matrix.size()-1;
+	i = 0;
+	j = 0;
+	while (i<=h&&j<=w)
+	{
+		circleMatrix(matrix, vec, i, j, h, w);
+		i++;
+		j++;
+		w--;
+		h--;
+	}
+	return vec;
+}
+
+vector<int> printMatrixV2(vector<vector<int> > matrix) {
+		int row = matrix.size();
+		int col = matrix[0].size();
+		vector<int> res;
+
+		// 输入的二维数组非法，返回空的数组
+		if (row == 0 || col == 0)  return res;
+
+		// 定义四个关键变量，表示左上和右下的打印范围
+		int left = 0, top = 0, right = col - 1, bottom = row - 1;
+		while (left <= right && top <= bottom)
+		{
+			// left to right
+			for (int i = left; i <= right; ++i)  res.push_back(matrix[top][i]);
+			// top to bottom
+			for (int i = top + 1; i <= bottom; ++i)  res.push_back(matrix[i][right]);
+			// right to left
+			if (top != bottom)
+				for (int i = right - 1; i >= left; --i)  res.push_back(matrix[bottom][i]);
+			// bottom to top
+			if (left != right)
+				for (int i = bottom - 1; i > top; --i)  res.push_back(matrix[i][left]);
+			left++, top++, right--, bottom--;
+		}
+		return res;
+}
+///////////////////////////////////////////////////////////////
+bool IsPopOrder(vector<int> pushV, vector<int> popV) {
+	if (pushV.size() == 0) return true;
+	stack<int> stackInt;
+	int size = pushV.size();
+	int i = 1;
+	int j = 0;
+	stackInt.push(pushV[0]);
+	while (stackInt.size() != 0 || i < size)
+	{
+		if (stackInt.empty())
+		{
+			stackInt.push(pushV[i]);
+			i++;
+		}
+		
+		if (stackInt.top() == popV[j])
+		{
+			stackInt.pop();
+			j++;
+		}
+		else if(i<size)
+		{
+			stackInt.push(pushV[i]);
+			i++;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	return true;
+}
+/////////////////////////////////////////////////////////////
+vector<int> PrintFromTopToBottom(TreeNode* root) {
+	queue<TreeNode *> quetree;
+	vector<int> res;
+	if (root == NULL)
+	{
+		return res;
+	}
+	quetree.push(root);
+	while (!quetree.empty())
+	{
+		int length = quetree.size();
+		while (length > 0)
+		{
+			TreeNode *p = quetree.front();
+			quetree.pop();
+			res.push_back(p->val);
+			if (p->left) quetree.push(p->left);
+			if (p->right) quetree.push(p->right);
+
+			length--;
+		}
+	}
+	return res;
+}
+/////////////////////////////////////////////////////////////
+bool getResOfBSTTree(vector<int> vec, int s, int e) 
+{
+	int i = 0;
+	int j = 0;
+	if (e - s <= 1) return true;
+	for (i = s;i<e;i++)
+	{
+		if (vec[i] > vec[e]) break;
+	}
+	for (j = i; j < e; j++) 
+	{
+		if (vec[j] < vec[e]) return false;
+	}
+	bool left = true;
+	bool right = true;
+	if (i>0) left = getResOfBSTTree(vec, s, i - 1);
+	if (i < vec.size() - 1) right = getResOfBSTTree(vec, i, e - 1);
+
+	return left&&right;
+}
+
+bool VerifySquenceOfBST(vector<int> sequence) {
+	if (sequence.size() == 0) return false;
+	return getResOfBSTTree(sequence, 0, sequence.size() - 1);
+}
+///////////////////////////////////////////////////////////
+vector<vector<int> >  res;
+vector<int> vec;
+vector<vector<int> > FindPath(TreeNode* root, int expectNumber) {
+	if (root == NULL) return res;
+	vec.push_back(root->val);
+	if (expectNumber - root->val == 0 && root->left == NULL&&root->right == NULL) res.push_back(vec);
+	if (root->left) FindPath(root->left, expectNumber - root->val);
+	if (root->right) FindPath(root->right, expectNumber - root->val);
+	if (vec.size() != 0) vec.pop_back();
+	return res;
+}
+//////////////////////////////////////////////////////////////////////////
+/*
+struct RandomListNode {
+int label;
+struct RandomListNode *next, *random;
+RandomListNode(int x) :
+label(x), next(NULL), random(NULL) {
+}
+};
+*/
+void cloneNode(RandomListNode* pHead) 
+{
+	RandomListNode* pNode = pHead;
+	while (pNode)
+	{
+		RandomListNode* p = new RandomListNode(pNode->label);
+		p->next = pNode->next;
+		pNode->next = p;
+		pNode = p->next;
+	}
+}
+void connectRandomNode(RandomListNode* pHead) 
+{
+	RandomListNode* pNode = pHead;
+	RandomListNode* pClone = pHead->next;
+	while (pNode)
+	{
+		if (pNode->random)
+		{
+			pClone->random = pNode->random->next;
+		}
+		pClone = pClone->next->next;
+		pNode = pNode->next->next;
+	}
+}
+RandomListNode* reconnectNode(RandomListNode* pHead) 
+{
+	////////////// v1
+	//RandomListNode* pNode = pHead;
+	//RandomListNode *pCloneHead = pHead->next;
+	//while (pNode)
+	//{
+	//	RandomListNode* pClone = pNode->next;
+	//	pNode->next = pClone->next;
+	//	pNode = pNode->next;
+	//	if (pNode)
+	//	{
+	//		pClone->next = pNode->next;
+	//	}
+	//}
+	///////////////////////////v2
+	RandomListNode* tmp;
+	RandomListNode *pCloneHead = pHead->next;
+	RandomListNode* curNode = pHead;
+	while (curNode->next) 
+	{
+		tmp = curNode->next;
+		curNode->next = tmp->next;
+		curNode = tmp;
+	}
+	return pCloneHead;
+}
+RandomListNode* Clone(RandomListNode* pHead)
+{
+	if (pHead == NULL) return NULL;
+	cloneNode(pHead);
+	connectRandomNode(pHead);
+	return reconnectNode(pHead);
+
+}
 
 int main() 
 {
 	vector<vector<int>> vecIntS = { 
-    { 1,2,8,9 } ,
-	{ 2,4,9,12 },
-	{ 4,7,10,13 },
-	{ 6,8,11,15 } };
+    { 1,2,3,4 },
+	{ 5,6,7,8 },
+	{ 9,10,11,12 },
+	{ 13,14,15,16 }};
 	vector<int> vec = { 1,2,3,4,5,6,7 };
-	vector<int> vec1 = { 0,0,1,2,3 ,4,5,6,3,3,22,3,5,5,6,65,5,22};
-	//sort(vec1.begin(), vec1.end());
-	//int t = rectCover(3);
-	//cout << t << endl;
-	reOrderArray(vec);
-	coutVec1d(vec);
+	vector<int> vec1 = { 1,2,3,7,5,6,4 };
+	//vector<int> res = printMatrix(vecIntS);
+	bool r = IsPopOrder(vec, vec1);
+	//coutVec1d(res);
+	cout << r << endl;
 	system("pause");
 	return 0;
 }
