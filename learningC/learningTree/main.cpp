@@ -1112,7 +1112,72 @@ RandomListNode* Clone(RandomListNode* pHead)
 	return reconnectNode(pHead);
 
 }
+////////////////////////////////////////////////
 
+TreeNode* Convert(TreeNode* pRootOfTree)
+{
+	stack<TreeNode*> stNode;
+	TreeNode* pNode = pRootOfTree;
+	TreeNode* Pre = NULL;
+	TreeNode* Phead;
+	while (pNode!=NULL||!stNode.empty())
+	{
+		if (pNode!=NULL)
+		{
+			stNode.push(pNode);
+			pNode = pNode->left;
+		}
+		else 
+		{
+			TreeNode* node = stNode.top();
+			stNode.pop();
+			if (Pre==NULL)
+			{
+				Pre = node;
+				Phead = node;
+			}
+			else 
+			{
+				Pre->right = node;
+				node->left = Pre;
+				Pre = node;
+			}
+			pNode = node->right;
+		}
+	}
+	return Phead;
+}
+//////////////////////////////////////////////////////
+void Permutation1(string str, vector<string>& vecStr, int begin) 
+{
+	if (begin == str.size())
+	{
+		vecStr.push_back(str);
+		return;
+	}
+	for (int i=begin;str[i]!='\0';i++)
+	{
+		if (i != begin&&str[begin] == str[i])
+			continue;
+		swap(str[begin], str[i]);
+		Permutation1(str, vecStr, begin + 1);
+		swap(str[begin], str[i]);
+	}
+}
+
+vector<string> Permutation(string str) {
+	vector<string>  vecStr;
+	if (str.size() == 0) return vecStr;
+	Permutation1(str, vecStr, 0);
+	sort(vecStr.begin(), vecStr.end());
+	return vecStr;
+}
+
+/////////////////////////////////////////////////////////
+int MoreThanHalfNum_Solution(vector<int> numbers) {
+
+}
+/////////////////////////////////////////////////////////
 int main() 
 {
 	vector<vector<int>> vecIntS = { 
