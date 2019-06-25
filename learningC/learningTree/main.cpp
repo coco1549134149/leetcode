@@ -1436,6 +1436,109 @@ int FirstNotRepeatingCharv2(string str)
 }
 
 /////////////////////////////////////////////////////////
+ListNode* FindFirstCommonNode(ListNode* pHead1, ListNode* pHead2) {
+	int len1 = 0, len2 = 0;
+	ListNode* p1 = pHead1;
+	ListNode* p2 = pHead2;
+
+	while (p1)
+	{
+		len1++;
+		p1 = p1->next;
+	}
+	while (p2) 
+	{
+		len2++;
+		p2 = p2->next;
+	}
+	int d = len1 - len2;
+	if (d>0)
+	{
+		p1 = pHead1;
+		p2 = pHead2;
+	}
+	else
+	{
+		d = -d;
+		p1 = pHead2;
+		p2 = pHead1;
+	}
+
+	for (int i=0;i<d;i++)
+	{
+		p1 = p1->next;
+	}
+
+	while (p1!=NULL&&p2!=NULL)
+	{
+		if (p1 == p2)
+			break;
+		p1 = p1->next;
+		p2 = p2->next;
+	}
+	return p1;
+}
+
+//////////////////////////////////////////////////////////////////
+//查找某个有序数组的某个数字的出现字数
+int GetNumberOfK(vector<int> data, int k) 
+{
+	if (data.size() == 0) return 0;
+	int begin = 0;
+	int end = data.size() - 1;
+	int m = 0;
+	int n = 0;
+	while (begin <= end)
+	{
+		m = (begin + end) / 2;
+		if (data[m] > k)
+		{
+			end = m - 1;
+		}
+		else if (data[m] < k)
+		{
+			begin = m + 1;
+		}
+		else
+		{
+			break;
+		}
+	}
+	if (data[m] == k)
+	{
+		n = m;
+		while (m >= 0)
+		{
+			if (data[m] == k)
+			{
+				m--;
+			}
+			else {
+				m++;
+				break;
+			}
+		}
+		if (m == -1) m++;
+		while (n < data.size())
+		{
+			if (data[n]==k)
+			{
+				n++;
+			}
+			else
+		        break;
+		}
+	}
+	else 
+	{
+		return 0;
+	}
+	return n - m;
+}
+
+
+
+
 int main() 
 {
 	vector<vector<int>> vecIntS = { 
@@ -1444,10 +1547,10 @@ int main()
 	{ 9,10,11,12 },
 	{ 13,14,15,16 }};
 	vector<int> vec = { 3334,3,3333332 };
-	vector<int> vec1 = { 4,5,1,6,2,7,3,8 };
+	vector<int> vec1 = {1,2,3,4,5,5,5,5,5,6,7,8 };
 	string str = "erhklkasldkalkdakdwrerladkaldka";
 	//vector<int> res = printMatrix(vecIntS);
-	int r = FirstNotRepeatingChar(str);
+	int r = GetNumberOfK(vec1,1);
 	//coutVec1d(r);
 	cout << r << endl;
 	system("pause");
