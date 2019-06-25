@@ -11,72 +11,9 @@
 #include <math.h>
 #include <queue>
 #include <functional>
+#include "commonFunc.h"
 #pragma comment(lib, "Ws2_32")
 using namespace std;
-
-template<typename T>
-void quicksort(vector<T>& data, int first, int last)
-{
-	int lower = first + 1;
-	int upper = last;
-	swap(data[first], data[(first + last) / 2]);
-	T bound = data[first];
-	while (lower < upper)
-	{
-		while (lower<last&&data[lower] < bound)
-			lower++;
-		while (upper >= (first + 1)&&data[upper] > bound)
-			upper--;
-		if (lower < upper)
-			swap(data[lower++], data[upper--]);
-	}
-	swap(data[upper], data[first]);
-	if (first < upper - 1)
-		quicksort(data, first, upper - 1);
-	if (upper + 1 < last)
-		quicksort(data, upper + 1, last);
-}
-
-
-class Node {
-public:
-	int val;
-	vector<Node*> children;
-
-	Node() {}
-
-	Node(int _val, vector<Node*> _children) {
-		val = _val;
-		children = _children;
-	}
-};
-
-
-  struct ListNode {
-        int val;
-        struct ListNode *next;
-        ListNode(int x) :
-              val(x), next(NULL) {
-        }
-  };
-
-
-struct TreeNode {
-	int val;
-	TreeNode *left;
-	TreeNode *right;
-	TreeNode(int x) : val(x), left(NULL), right(NULL) {}
-
-};
-
-
-struct RandomListNode {
-	int label;
-	struct RandomListNode *next, *random;
-	RandomListNode(int x) :
-		label(x), next(NULL), random(NULL) {
-	}
-};
 
 void postorderV2(vector<int>& num, Node* node) 
 {
@@ -1535,9 +1472,96 @@ int GetNumberOfK(vector<int> data, int k)
 	}
 	return n - m;
 }
+///////////////////////////////////////////////////////////////////////////
+int StrToInt(string str) {
+	if (str.size() == 0) return 0;
+	int sum = 0;
+	bool flag = true;
+	for (char c : str)
+	{
+		if (c=='-')
+		{
+			flag = false;
+		}
+		else if (c=='+')
+		{
+		    flag = true;
+		}
+		else if (c>='0'&&c<='9')
+		{
+			sum = sum * 10 + (c - '0');
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	if (flag) return sum;
+	else return -sum;
+}
+////////////////////////////////////////////////////////////////
+// Parameters:
+//        numbers:     an array of integers
+//        length:      the length of array numbers
+//        duplication: (Output) the duplicated number in the array number
+// Return value:       true if the input is valid, and there are some duplications in the array number
+//                     otherwise false
+bool duplicate(int numbers[], int length, int* duplication) {
+	vector<int> vec(length);
+	for (int i=0;i<length;i++)
+	{
+		vec[numbers[i]]++;
+	}
+	for (int i = 0; i < length; i++)
+	{
+		if (vec[numbers[i]]>1)
+		{
+			*duplication = numbers[i];
+			return true;
+		}
+	}
+	return false;
+}
+//////////////////////////////////////////////////////////////////
+//给定一个数组A[0,1,...,n-1],请构建一个数组B[0,1,...,n-1],其中B中的元素B[i]=A[0]*A[1]*...*A[i-1]*A[i+1]*...*A[n-1]。不能使用除法。
+vector<int> multiply(const vector<int>& A) {
+	int sum = 1;
+	vector<int> res(A.size());
+	int index, count = 0;
+	for (int i = 0;i<A.size();i++)
+	{
+		int a = A[i];
+		if (a==0)
+		{
+			index = i;
+			count++;
+			
+		}
+		else
+		{
+			sum *= a;
+		}
+	}
+	if (count>1)
+	{
+		return res;
+	}
+	else if (count==1)
+	{
+		res[index] = sum;
+	}
+	else
+	{
+		for (int i = 0; i<A.size(); i++)
+		{
+			int a = A[i];
+			int d = divide(sum, a);
+			res[i] = d;
+		}
+	}
 
-
-
+	return res;
+}
 
 int main() 
 {
@@ -1547,12 +1571,12 @@ int main()
 	{ 9,10,11,12 },
 	{ 13,14,15,16 }};
 	vector<int> vec = { 3334,3,3333332 };
-	vector<int> vec1 = {1,2,3,4,5,5,5,5,5,6,7,8 };
-	string str = "erhklkasldkalkdakdwrerladkaldka";
-	//vector<int> res = printMatrix(vecIntS);
-	int r = GetNumberOfK(vec1,1);
-	//coutVec1d(r);
-	cout << r << endl;
+	vector<int> vec1 = { 1,2,0,4,5 };
+	string str = "-1233aad234";
+	vector<int> res = multiply(vec1);
+	//int r = divide(66,6);
+	coutVec1d(res);
+	//cout << r << endl;
 	system("pause");
 	return 0;
 }
