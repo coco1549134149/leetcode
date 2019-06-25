@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <math.h>
 #include <queue>
+#include <functional>
 #pragma comment(lib, "Ws2_32")
 using namespace std;
 
@@ -1175,8 +1176,265 @@ vector<string> Permutation(string str) {
 
 /////////////////////////////////////////////////////////
 int MoreThanHalfNum_Solution(vector<int> numbers) {
-
+	if (numbers.size() == 0) return 0;
+	int num, count;
+	num = 0;
+	count = 0;
+	for (int n:numbers)
+	{
+		if (num==n)
+		{
+			count++;
+		}
+		else if (num!=n&&count!=0)
+		{
+			count--;
+		}
+		else if (num!=n&&count==0)
+		{
+			num = n;
+			count++;
+		}
+	}
+	count = 0;
+	for (int n:numbers)
+	{
+		if (n==num)
+		{
+			count++;
+		}
+	}
+	return count * 2 > numbers.size() ? num : 0;
 }
+/////////////////////////////////////////////////////////
+
+int Partition_index(vector<int>& vec, int begin, int end) 
+{
+	int low = begin;
+	int high = end;
+	int p = vec[low];
+	while (low<high)
+	{
+		while (low < high&&p <= vec[high])
+			high--;
+		vec[low] = vec[high];
+		while (low < high&&p >= vec[low])
+			low++;
+		vec[high] = vec[low];
+	}
+	vec[low] = p;
+	return low;
+}
+
+
+vector<int> GetLeastNumbers_Solution(vector<int> input, int k) {
+	
+	if (input.size() < k) return vector<int>();
+	if (input.size() == k) return input;
+
+	int start = 0;
+	int end = input.size() - 1;
+	int index = Partition_index(input, start, end);
+	while (index!=(k-1))
+	{
+		if (index<(k-1))
+		{
+			start = index + 1;
+			index = Partition_index(input, start, end);
+		}
+		else if (index>(k-1))
+		{
+			end = index - 1;
+			index = Partition_index(input, start, end);
+		}
+	}
+	
+	vector<int> vec(input.begin(), input.begin() + k);
+	sort(vec.begin(), vec.end());
+	return vec;
+}
+//法2  待理解
+vector<int> GetLeastNumbers_Solution_v2(vector<int> input, int k) 
+{
+	int len = input.size();
+	if (len <= 0 || k > len) return vector<int>();
+
+	//仿函数中的greater<T>模板，从大到小排序
+	multiset<int, greater<int> > leastNums;
+	vector<int>::iterator vec_it = input.begin();
+	for (; vec_it != input.end(); vec_it++)
+	{
+		//将前k个元素插入集合
+		if (leastNums.size() < k)
+			leastNums.insert(*vec_it);
+		else
+		{
+			//第一个元素是最大值
+			multiset<int, greater<int> >::iterator greatest_it = leastNums.begin();
+			//如果后续元素<第一个元素，删除第一个，加入当前元素
+			if (*vec_it < *(leastNums.begin()))
+			{
+				leastNums.erase(greatest_it);
+				leastNums.insert(*vec_it);
+			}
+		}
+	}
+
+	return vector<int>(leastNums.begin(), leastNums.end());
+}
+
+
+///////////////////////////////////////////////////////////////////
+int FindGreatestSumOfSubArray(vector<int> array) {
+	if (array.size() == 0) return 0;
+	int max = -100;
+	int sum = 0;
+	
+	for (int n:array)
+	{
+		sum += n;
+		if (max<=sum)
+		{
+			max = sum;
+		}
+		if (sum<0)
+		{
+			sum = 0;
+		}
+	}
+	return max;
+}
+
+///////////////////////////////////////////////////////////////////
+int NumberOf1Between1AndN_Solution(int n)
+{
+	//主要思路：设定整数点（如1、10、100等等）作为位置点i（对应n的各位、十位、百位等等），分别对每个数位上有多少包含1的点进行分析
+	//根据设定的整数位置，对n进行分割，分为两部分，高位n/i，低位n%i
+	//当i表示百位，且百位对应的数>=2,如n=31456,i=100，则a=314,b=56，此时百位为1的次数有a/10+1=32（最高两位0~31），每一次都包含100个连续的点，即共有(a%10+1)*100个点的百位为1
+	//当i表示百位，且百位对应的数为1，如n=31156,i=100，则a=311,b=56，此时百位对应的就是1，则共有a%10(最高两位0-30)次是包含100个连续点，当最高两位为31（即a=311），本次只对应局部点00~56，共b+1次，
+	//所有点加起来共有（a%10*100）+(b+1)，这些点百位对应为1
+	//当i表示百位，且百位对应的数为0,如n=31056,i=100，则a=310,b=56，此时百位为1的次数有a/10=31（最高两位0~30）
+	//综合以上三种情况，当百位对应0或>=2时，有(a+8)/10次包含所有100个点，还有当百位为1(a%10==1)，需要增加局部点b+1
+	//之所以补8，是因为当百位为0，则a/10==(a+8)/10，当百位>=2，补8会产生进位位，效果等同于(a/10+1)
+	int count = 0;
+	long long i = 1;
+	for (i = 1; i <= n; i *= 10)
+	{
+		//i表示当前分析的是哪一个数位
+		int a = n / i, b = n%i;
+		count = count + (a + 8) / 10 * i + (a % 10 == 1)*(b + 1);
+	}
+	return count;
+}
+
+/////////////////////////////////////////////////////////////////////
+bool pibjie(int a, int b)
+{
+	string A = "";
+	string B = "";
+	A += to_string(a);
+	A += to_string(b);
+	B += to_string(b);
+	B += to_string(a);
+	return A < B;
+}
+string PrintMinNumber(vector<int> numbers) {
+	if (numbers.size() == 0) return "";
+	if (numbers.size() == 1) return to_string(numbers[0]);
+	string str="";
+	sort(numbers.begin(), numbers.end());
+	long long a, b;
+	a = numbers[0];
+	for (int i = 1; i < numbers.size(); i++) 
+	{
+		b = numbers[i];
+        if (pibjie(a,b))
+        {
+			a = a*pow(10,to_string(b).size()) + b;
+        }
+		else
+		{
+			a = b*pow(10,to_string(a).size()) + a;
+		}
+	}
+	return to_string(a);
+}
+
+string PrintMinNumber_v2(vector<int> numbers) {
+	string  answer = "";
+	sort(numbers.begin(), numbers.end(), pibjie);   //sort可以自己定制排序规则  排序规则必须要是静态函数
+	for (int i = 0; i < numbers.size(); i++) {
+		answer += to_string(numbers[i]);
+	}
+	return answer;
+}
+////////////////////////////////////////////////////////////////////
+int GetUglyNumber_Solution(int index) {            //丑数   都是由2，3，5为因子组成
+	if (index < 7)return index;
+	vector<int> res(index);
+	res[0] = 1;
+	int t2 = 0, t3 = 0, t5 = 0, i;
+	for (i = 1; i < index; ++i)
+	{
+		res[i] = min(res[t2] * 2, min(res[t3] * 3, res[t5] * 5));
+		if (res[i] == res[t2] * 2)t2++;
+		if (res[i] == res[t3] * 3)t3++;
+		if (res[i] == res[t5] * 5)t5++;
+	}
+	return res[index - 1];
+}
+///////////////////////////////////////////////////////////////////
+int FirstNotRepeatingChar(string str) {
+	if (str.size() == 0) return -1;
+	map<char, int> mapChar;
+	map<char, int>::iterator it;
+	for (int i = 0;i<str.size();i++)
+	{
+		char c = str[i];
+		it = mapChar.find(c);
+		if (it!=mapChar.end())
+		{
+			mapChar[c] = -1;
+		}
+		else
+		{
+			mapChar[char(c)] = i;
+		}
+	}
+	int min =10000;
+	for (auto ch:mapChar)
+	{
+		int index = ch.second;
+		if (index >=0)
+		{
+			min = min < index ? min : index;
+		}
+	}
+	return min;
+}
+
+int FirstNotRepeatingCharv2(string str)
+{
+	int len = str.size();
+	if (len <= 0)
+		return -1;
+	int cnt[100] = { 0 };
+	int i, res = -1;
+	for (i = 0; i < len; i++)
+	{
+		cnt[str[i] - 'A']++;
+	}
+	for (i = 0; i < len; i++)
+	{
+		if (cnt[str[i] - 'A'] == 1)
+		{
+			res = i;
+			break;
+		}
+	}
+	return res;
+}
+
 /////////////////////////////////////////////////////////
 int main() 
 {
@@ -1185,11 +1443,12 @@ int main()
 	{ 5,6,7,8 },
 	{ 9,10,11,12 },
 	{ 13,14,15,16 }};
-	vector<int> vec = { 1,2,3,4,5,6,7 };
-	vector<int> vec1 = { 1,2,3,7,5,6,4 };
+	vector<int> vec = { 3334,3,3333332 };
+	vector<int> vec1 = { 4,5,1,6,2,7,3,8 };
+	string str = "erhklkasldkalkdakdwrerladkaldka";
 	//vector<int> res = printMatrix(vecIntS);
-	bool r = IsPopOrder(vec, vec1);
-	//coutVec1d(res);
+	int r = FirstNotRepeatingChar(str);
+	//coutVec1d(r);
 	cout << r << endl;
 	system("pause");
 	return 0;
