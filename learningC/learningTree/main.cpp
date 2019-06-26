@@ -1563,6 +1563,174 @@ vector<int> multiply(const vector<int>& A) {
 	return res;
 }
 
+//方法2
+vector<int> multiplyv2(const vector<int>& A) 
+{
+	int n = A.size();
+	vector<int> b0(n, 1);
+	vector<int> b1(n, 1);
+	for (int i=1;i<n;i++)
+	{
+		b0[i] = b0[i - 1] * A[i - 1];
+	}
+	for (int i = n-2;i>=0;i--)
+	{
+		b1[i] = b1[i + 1] * A[i + 1];
+	}
+	vector<int> b(n, 1);
+	for (int i =0;i<n;i++)
+	{
+		b[i] = b0[i] * b1[i];
+	}
+	return b;
+}
+///////////////////////////////////////////////////////////////////
+//请实现一个函数用来匹配包括'.'和'*'的正则表达式。模式中的字符'.'表示任意一个字符，而'*'表示它前面的字符可以出现任意次（包含0次）。 
+//在本题中，匹配是指字符串的所有字符匹配整个模式。例如，字符串"aaa"与模式"a.a"和"ab*ac*a"匹配，但是与"aa.a"和"ab*a"均不匹配
+/*
+	首先，考虑特殊情况：
+	1>两个字符串都为空，返回true
+	2>当第一个字符串不空，而第二个字符串空了，返回false（因为这样，就无法
+	匹配成功了,而如果第一个字符串空了，第二个字符串非空，还是可能匹配成
+	功的，比如第二个字符串是“a*a*a*a*”,由于‘*’之前的元素可以出现0次，
+	所以有可能匹配成功）
+	之后就开始匹配第一个字符，这里有两种可能：匹配成功或匹配失败。但考虑到pattern
+	下一个字符可能是‘*’， 这里我们分两种情况讨论：pattern下一个字符为‘*’或
+	不为‘*’：
+	1>pattern下一个字符不为‘*’：这种情况比较简单，直接匹配当前字符。如果
+	匹配成功，继续匹配下一个；如果匹配失败，直接返回false。注意这里的
+	“匹配成功”，除了两个字符相同的情况外，还有一种情况，就是pattern的
+	当前字符为‘.’,同时str的当前字符不为‘\0’。
+	2>pattern下一个字符为‘*’时，稍微复杂一些，因为‘*’可以代表0个或多个。
+	这里把这些情况都考虑到：
+	a>当‘*’匹配0个字符时，str当前字符不变，pattern当前字符后移两位，
+	跳过这个‘*’符号；
+	b>当‘*’匹配1个或多个时，str当前字符移向下一个，pattern当前字符
+	不变。（这里匹配1个或多个可以看成一种情况，因为：当匹配一个时，
+	由于str移到了下一个字符，而pattern字符不变，就回到了上边的情况a；
+	当匹配多于一个字符时，相当于从str的下一个字符继续开始匹配）
+	之后再写代码就很简单了。
+*/
+bool match(char* str, char* pattern)
+{
+	if (*str == '\0' && *pattern == '\0')
+		return true;
+	if (*str != '\0' && *pattern == '\0')
+		return false;
+
+	if (*(pattern+1)!='*')
+	{
+		if (*str == *pattern || (*str != '\0'&&*pattern == '.'))
+			return match(str + 1, pattern + 1);
+		else
+			return false;
+	}
+	else 
+	{
+		if (*str == *pattern || (*str != '\0'&&*pattern == '.')) 
+		{
+			return match(str, pattern + 2) || match(str + 1, pattern);
+		}
+		else
+		{
+			return match(str, pattern + 2);
+		}
+	}
+}
+
+//请实现一个函数用来判断字符串是否表示数值（包括整数和小数）。例如，字符串"+100","5e2","-123","3.1416"和"-1E-16"都表示数值。
+//但是"12e","1a3.14","1.2.3","+-5"和"12e+4.3"都不是。
+//首先判断是否有符号（ + 或者 - ），如果有，则对后面的字符串判断
+//首先需要扫描数字直到结束或是遇到其他字符，结束则返回true，否则继续按情况判断下一个需要判断的字符
+//
+//如果是小数点'.'，是则扫描数字，直到结束（返回true）或者遇到特殊字符，如果是e或E，那么对后面的数判断是否符合指数表示，如果是其他字符则返回false。
+//如果是e或者E，那么对后面的数判断是否符合指数表示。
+//如果不符合上面的情况则返回false
+//指数判断：
+//首先判断是否是符号，如果是，跳到下一位判断后面的是否是数字组成的串，是则表示指数表示是正确的，否则是不正确的。
+int indexOfStr(char* string) 
+{
+	int index = 0;
+	while (*string >= '0'&&*string <= '9')
+	{
+		index++;
+		string++;
+	}
+	return index;
+}
+
+bool isExponential(char* string) 
+{
+	if (*string!='\0')
+	{
+		if (*string == '+' || *string == '-') string++;
+		int index = indexOfStr(string);
+		string += index;
+		if (*string == '\0') return true;
+		return false;
+	}
+	return false;
+}
+
+bool isNumeric(char* string)
+{
+	if (string == NULL) return false;
+	if (*string == '+' || *string == '-')
+		string++;
+	if (*string == '\0') return false;
+	int index = indexOfStr(string);
+	string += index;
+	if (*string!='\0')
+	{
+		if (*string =='.')
+		{
+			string++;
+			int index2 = indexOfStr(string);
+			string += index2;
+			if (*string!='\0')
+			{
+				if (*string=='e'||*string=='E')
+				{
+					string++;
+					return isExponential(string);
+				}
+				return false;
+			}
+			return true;
+		}
+		else if (*string == 'e' || *string == 'E')
+		{
+			string++;
+			return isExponential(string);
+		}
+		return false;
+	}
+	return true;
+
+}
+
+//请实现一个函数用来找出字符流中第一个只出现一次的字符。例如，当从字符流中只读出前两个字符"go"时，第一个只出现一次的字符是"g"。
+//当从该字符流中读出前六个字符“google"时，第一个只出现一次的字符是"l"。
+//Insert one char from stringstream
+string strForFirstAppear="";
+//vector<int> countOfChars(128,0);  这句不行  换成下一句可以  //不知道为什么
+int countOfChars[128] = { 0 };
+void Insert(char ch)
+{
+	strForFirstAppear += ch;
+	countOfChars[ch]++;
+}
+//return the first appearence once char in current stringstream
+char FirstAppearingOnce()
+{
+	int size = strForFirstAppear.size();
+	for(int i=0;i<size;i++)
+	{
+		if (countOfChars[strForFirstAppear[i]] == 1) return strForFirstAppear[i];
+	}
+	return '#';
+}
+
 int main() 
 {
 	vector<vector<int>> vecIntS = { 
@@ -1573,10 +1741,11 @@ int main()
 	vector<int> vec = { 3334,3,3333332 };
 	vector<int> vec1 = { 1,2,0,4,5 };
 	string str = "-1233aad234";
-	vector<int> res = multiply(vec1);
-	//int r = divide(66,6);
-	coutVec1d(res);
-	//cout << r << endl;
+	char* string = "12e";
+	//vector<int> res = multiplyv2(vec1);
+	//bool r = isNumeric(string);
+	//coutVec1d(res);
+	//cout << '\0' << endl;
 	system("pause");
 	return 0;
 }
