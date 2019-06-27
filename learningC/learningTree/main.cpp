@@ -1731,6 +1731,263 @@ char FirstAppearingOnce()
 	return '#';
 }
 
+//给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出null。
+//https://www.nowcoder.com/questionTerminal/253d2c59ec3e4bc68da16833f79a38e4
+ListNode* EntryNodeOfLoop(ListNode* pHead)
+{
+	if (pHead == NULL||pHead->next==NULL) return NULL;
+	ListNode* p1 = pHead;
+	ListNode* p2 = pHead;
+
+	while (p1->next!=NULL&&p2->next!=NULL)
+	{
+		p1 = p1->next;
+		p2 = p2->next->next;
+		if (p1==p2)
+		{
+			p2 = pHead;
+			while (p1!=p2)
+			{
+				p1 = p1->next;
+				p2 = p2->next;
+			}
+			if (p1==p2)
+			{
+				return p1;
+			}
+		}
+	}
+	return NULL;
+}
+
+//在一个排序的链表中，存在重复的结点，请删除该链表中重复的结点，重复的结点不保留，返回链表头指针。 
+//例如，链表1->2->3->3->4->4->5 处理后为 1->2->5
+ListNode* deleteDuplication(ListNode* pHead)
+{
+	if (pHead == NULL || pHead->next == NULL) return pHead;
+	bool flag = false;
+	bool head = false;
+	ListNode* pre = pHead;
+	ListNode* pNode = pHead;
+	
+
+	while (pNode->next!=NULL)
+	{
+		if (pNode->val== pNode->next->val)
+		{
+			flag = true;
+			pNode->next = pNode->next->next;
+		}
+		else
+		{
+			if (head)
+			{
+				if (flag)
+				{
+					flag = false;
+					pre->next = pNode->next;
+				}
+				else
+				{
+					pre = pNode;
+				}
+			}
+			else
+			{
+				if (flag)
+				{
+					flag = false;
+				}
+				else
+				{
+					pHead = pNode;
+					head = true;
+					pre = pHead;
+				}
+			}
+			pNode = pNode->next;
+
+		}
+	}
+	if (flag && (!head)) return NULL;
+	if (flag&&head) pre->next = NULL;
+	if (!head) return pNode;
+	return pHead;
+}
+
+
+//遍历单链表
+void coutListNode(ListNode* head) 
+{
+	ListNode* p = head;
+	while (p != NULL)
+	{
+		cout << p->val <<"    ";
+		p = p->next;
+	}
+	cout << endl;
+}
+//新建链表
+ListNode* newListNode(vector<int> vec) 
+{
+	if (vec.size() <= 0) return NULL;
+	ListNode* head = new ListNode(vec[0]);
+	ListNode* p = head;
+    for (int i =1;i<vec.size();i++)
+    {
+		ListNode* n = new ListNode(vec[i]);
+		p->next = n;
+		p = n;
+    }
+	return head;
+}
+
+//给定一个二叉树和其中的一个结点，请找出中序遍历顺序的下一个结点并且返回。
+//注意，树中的结点不仅包含左右子结点，同时包含指向父结点的指针。
+TreeLinkNode* GetNext(TreeLinkNode* pNode)
+{
+	if (pNode == NULL) return NULL;
+	if (pNode->right!=NULL)
+	{
+		pNode = pNode->right;
+		while (pNode->left != NULL)
+		{
+			pNode = pNode->left;
+		}
+		return pNode;
+	}
+	while (pNode->next!=NULL)
+	{
+		TreeLinkNode* p = pNode->next;
+		if (p->left==pNode)
+		{
+			return p;
+		}
+		pNode = pNode->next;
+	}
+	return NULL;
+}
+
+//请实现一个函数，用来判断一颗二叉树是不是对称的。注意，如果一个二叉树同此二叉树的镜像是同样的，定义其为对称的。
+//方法1
+bool isSymmetrical1(TreeNode* p1, TreeNode* p2) 
+{
+	if (p1 == NULL&&p2 == NULL) return true;
+	if (p1 == NULL || p2 == NULL) return false;
+	if (p1->val != p2->val) return false;
+
+	return isSymmetrical1(p1->left, p2->right) && isSymmetrical1(p1->right, p2->left);
+
+}
+bool isSymmetrical(TreeNode* pRoot)
+{
+	return isSymmetrical1(pRoot, pRoot);
+}
+//方法2
+bool isSymmetrical2(TreeNode* pRoot) 
+{
+	if (pRoot == NULL) return true;
+	stack<TreeNode*> st;
+	st.push(pRoot->left);
+	st.push(pRoot->right);
+	while (!st.empty())
+	{
+		TreeNode* left = st.top();
+		st.pop();
+		TreeNode* right = st.top();
+		st.pop();
+		if (left == NULL&&right == NULL) continue;
+		if (left == NULL || right == NULL) return false;
+		if (left->val != right->val) return false;
+		st.push(left->left);
+		st.push(right->right);
+		st.push(left->right);
+		st.push(right->left);
+	}
+	return true;
+}
+
+//请实现一个函数按照之字形打印二叉树，即第一行按照从左到右的顺序打印，第二层按照从右至左的顺序打印，第三行按照从左到右的顺序打印，其他行以此类推。
+vector<vector<int> > Print(TreeNode* pRoot) {
+	queue<TreeNode *> quetree;
+	vector<vector<int> > res;
+	bool rightBegin= false;
+	if (pRoot == NULL)
+	{
+		return res;
+	}
+	quetree.push(pRoot);
+	while (!quetree.empty())
+	{
+		int length = quetree.size();
+		vector<int> vec;
+		while (length > 0)
+		{
+			TreeNode *p = quetree.front();
+			quetree.pop();
+			vec.push_back(p->val);
+			if (p->left) quetree.push(p->left);
+			if (p->right) quetree.push(p->right);
+
+			length--;
+		}
+		if (rightBegin)
+		{
+			reverse(vec.begin(), vec.end());
+			rightBegin = false;
+		}
+		else
+			rightBegin = true;
+		res.push_back(vec);
+	}
+	return res;
+}
+
+//从上到下按层打印二叉树，同一层结点从左至右输出。每一层输出一行。
+vector<vector<int> > Print(TreeNode* pRoot) {
+	queue<TreeNode *> quetree;
+	vector<vector<int> > res;
+	if (pRoot == NULL)
+	{
+		return res;
+	}
+	quetree.push(pRoot);
+	while (!quetree.empty())
+	{
+		int length = quetree.size();
+		vector<int> vec;
+		while (length > 0)
+		{
+			TreeNode *p = quetree.front();
+			quetree.pop();
+			vec.push_back(p->val);
+			if (p->left) quetree.push(p->left);
+			if (p->right) quetree.push(p->right);
+
+			length--;
+		}
+		res.push_back(vec);
+	}
+	return res;
+}
+
+//请实现两个函数，分别用来序列化和反序列化二叉树
+//什么叫序列化啊。。。。。
+void Serialize_f(TreeNode* root, string &s) 
+{
+	if (root == NULL) s += "#";
+
+}
+
+char* Serialize(TreeNode *root) {
+	string s = "";
+	if (root == NULL) return "";
+
+}
+TreeNode* Deserialize(char *str) {
+
+}
+
 int main() 
 {
 	vector<vector<int>> vecIntS = { 
@@ -1739,13 +1996,16 @@ int main()
 	{ 9,10,11,12 },
 	{ 13,14,15,16 }};
 	vector<int> vec = { 3334,3,3333332 };
-	vector<int> vec1 = { 1,2,0,4,5 };
+	vector<int> vec1 = { 1,1,2,2,2,3,3,3,4,4,5 };
 	string str = "-1233aad234";
 	char* string = "12e";
 	//vector<int> res = multiplyv2(vec1);
 	//bool r = isNumeric(string);
 	//coutVec1d(res);
 	//cout << '\0' << endl;
+	ListNode* pNode = newListNode(vec1);
+	ListNode* res = deleteDuplication(pNode);
+	coutListNode(res);
 	system("pause");
 	return 0;
-}
+} 
