@@ -10,72 +10,10 @@
 #include <algorithm>
 #include <math.h>
 #include <queue>
+#include <functional>
+#include "commonFunc.h"
 #pragma comment(lib, "Ws2_32")
 using namespace std;
-
-template<typename T>
-void quicksort(vector<T>& data, int first, int last)
-{
-	int lower = first + 1;
-	int upper = last;
-	swap(data[first], data[(first + last) / 2]);
-	T bound = data[first];
-	while (lower < upper)
-	{
-		while (lower<last&&data[lower] < bound)
-			lower++;
-		while (upper >= (first + 1)&&data[upper] > bound)
-			upper--;
-		if (lower < upper)
-			swap(data[lower++], data[upper--]);
-	}
-	swap(data[upper], data[first]);
-	if (first < upper - 1)
-		quicksort(data, first, upper - 1);
-	if (upper + 1 < last)
-		quicksort(data, upper + 1, last);
-}
-
-
-class Node {
-public:
-	int val;
-	vector<Node*> children;
-
-	Node() {}
-
-	Node(int _val, vector<Node*> _children) {
-		val = _val;
-		children = _children;
-	}
-};
-
-
-  struct ListNode {
-        int val;
-        struct ListNode *next;
-        ListNode(int x) :
-              val(x), next(NULL) {
-        }
-  };
-
-
-struct TreeNode {
-	int val;
-	TreeNode *left;
-	TreeNode *right;
-	TreeNode(int x) : val(x), left(NULL), right(NULL) {}
-
-};
-
-
-struct RandomListNode {
-	int label;
-	struct RandomListNode *next, *random;
-	RandomListNode(int x) :
-		label(x), next(NULL), random(NULL) {
-	}
-};
 
 void postorderV2(vector<int>& num, Node* node) 
 {
@@ -1112,6 +1050,943 @@ RandomListNode* Clone(RandomListNode* pHead)
 	return reconnectNode(pHead);
 
 }
+////////////////////////////////////////////////
+
+TreeNode* Convert(TreeNode* pRootOfTree)
+{
+	stack<TreeNode*> stNode;
+	TreeNode* pNode = pRootOfTree;
+	TreeNode* Pre = NULL;
+	TreeNode* Phead;
+	while (pNode!=NULL||!stNode.empty())
+	{
+		if (pNode!=NULL)
+		{
+			stNode.push(pNode);
+			pNode = pNode->left;
+		}
+		else 
+		{
+			TreeNode* node = stNode.top();
+			stNode.pop();
+			if (Pre==NULL)
+			{
+				Pre = node;
+				Phead = node;
+			}
+			else 
+			{
+				Pre->right = node;
+				node->left = Pre;
+				Pre = node;
+			}
+			pNode = node->right;
+		}
+	}
+	return Phead;
+}
+//////////////////////////////////////////////////////
+void Permutation1(string str, vector<string>& vecStr, int begin) 
+{
+	if (begin == str.size())
+	{
+		vecStr.push_back(str);
+		return;
+	}
+	for (int i=begin;str[i]!='\0';i++)
+	{
+		if (i != begin&&str[begin] == str[i])
+			continue;
+		swap(str[begin], str[i]);
+		Permutation1(str, vecStr, begin + 1);
+		swap(str[begin], str[i]);
+	}
+}
+
+vector<string> Permutation(string str) {
+	vector<string>  vecStr;
+	if (str.size() == 0) return vecStr;
+	Permutation1(str, vecStr, 0);
+	sort(vecStr.begin(), vecStr.end());
+	return vecStr;
+}
+
+/////////////////////////////////////////////////////////
+int MoreThanHalfNum_Solution(vector<int> numbers) {
+	if (numbers.size() == 0) return 0;
+	int num, count;
+	num = 0;
+	count = 0;
+	for (int n:numbers)
+	{
+		if (num==n)
+		{
+			count++;
+		}
+		else if (num!=n&&count!=0)
+		{
+			count--;
+		}
+		else if (num!=n&&count==0)
+		{
+			num = n;
+			count++;
+		}
+	}
+	count = 0;
+	for (int n:numbers)
+	{
+		if (n==num)
+		{
+			count++;
+		}
+	}
+	return count * 2 > numbers.size() ? num : 0;
+}
+/////////////////////////////////////////////////////////
+
+int Partition_index(vector<int>& vec, int begin, int end) 
+{
+	int low = begin;
+	int high = end;
+	int p = vec[low];
+	while (low<high)
+	{
+		while (low < high&&p <= vec[high])
+			high--;
+		vec[low] = vec[high];
+		while (low < high&&p >= vec[low])
+			low++;
+		vec[high] = vec[low];
+	}
+	vec[low] = p;
+	return low;
+}
+
+
+vector<int> GetLeastNumbers_Solution(vector<int> input, int k) {
+	
+	if (input.size() < k) return vector<int>();
+	if (input.size() == k) return input;
+
+	int start = 0;
+	int end = input.size() - 1;
+	int index = Partition_index(input, start, end);
+	while (index!=(k-1))
+	{
+		if (index<(k-1))
+		{
+			start = index + 1;
+			index = Partition_index(input, start, end);
+		}
+		else if (index>(k-1))
+		{
+			end = index - 1;
+			index = Partition_index(input, start, end);
+		}
+	}
+	
+	vector<int> vec(input.begin(), input.begin() + k);
+	sort(vec.begin(), vec.end());
+	return vec;
+}
+//法2  待理解
+vector<int> GetLeastNumbers_Solution_v2(vector<int> input, int k) 
+{
+	int len = input.size();
+	if (len <= 0 || k > len) return vector<int>();
+
+	//仿函数中的greater<T>模板，从大到小排序
+	multiset<int, greater<int> > leastNums;
+	vector<int>::iterator vec_it = input.begin();
+	for (; vec_it != input.end(); vec_it++)
+	{
+		//将前k个元素插入集合
+		if (leastNums.size() < k)
+			leastNums.insert(*vec_it);
+		else
+		{
+			//第一个元素是最大值
+			multiset<int, greater<int> >::iterator greatest_it = leastNums.begin();
+			//如果后续元素<第一个元素，删除第一个，加入当前元素
+			if (*vec_it < *(leastNums.begin()))
+			{
+				leastNums.erase(greatest_it);
+				leastNums.insert(*vec_it);
+			}
+		}
+	}
+
+	return vector<int>(leastNums.begin(), leastNums.end());
+}
+
+
+///////////////////////////////////////////////////////////////////
+int FindGreatestSumOfSubArray(vector<int> array) {
+	if (array.size() == 0) return 0;
+	int max = -100;
+	int sum = 0;
+	
+	for (int n:array)
+	{
+		sum += n;
+		if (max<=sum)
+		{
+			max = sum;
+		}
+		if (sum<0)
+		{
+			sum = 0;
+		}
+	}
+	return max;
+}
+
+///////////////////////////////////////////////////////////////////
+int NumberOf1Between1AndN_Solution(int n)
+{
+	//主要思路：设定整数点（如1、10、100等等）作为位置点i（对应n的各位、十位、百位等等），分别对每个数位上有多少包含1的点进行分析
+	//根据设定的整数位置，对n进行分割，分为两部分，高位n/i，低位n%i
+	//当i表示百位，且百位对应的数>=2,如n=31456,i=100，则a=314,b=56，此时百位为1的次数有a/10+1=32（最高两位0~31），每一次都包含100个连续的点，即共有(a%10+1)*100个点的百位为1
+	//当i表示百位，且百位对应的数为1，如n=31156,i=100，则a=311,b=56，此时百位对应的就是1，则共有a%10(最高两位0-30)次是包含100个连续点，当最高两位为31（即a=311），本次只对应局部点00~56，共b+1次，
+	//所有点加起来共有（a%10*100）+(b+1)，这些点百位对应为1
+	//当i表示百位，且百位对应的数为0,如n=31056,i=100，则a=310,b=56，此时百位为1的次数有a/10=31（最高两位0~30）
+	//综合以上三种情况，当百位对应0或>=2时，有(a+8)/10次包含所有100个点，还有当百位为1(a%10==1)，需要增加局部点b+1
+	//之所以补8，是因为当百位为0，则a/10==(a+8)/10，当百位>=2，补8会产生进位位，效果等同于(a/10+1)
+	int count = 0;
+	long long i = 1;
+	for (i = 1; i <= n; i *= 10)
+	{
+		//i表示当前分析的是哪一个数位
+		int a = n / i, b = n%i;
+		count = count + (a + 8) / 10 * i + (a % 10 == 1)*(b + 1);
+	}
+	return count;
+}
+
+/////////////////////////////////////////////////////////////////////
+bool pibjie(int a, int b)
+{
+	string A = "";
+	string B = "";
+	A += to_string(a);
+	A += to_string(b);
+	B += to_string(b);
+	B += to_string(a);
+	return A < B;
+}
+string PrintMinNumber(vector<int> numbers) {
+	if (numbers.size() == 0) return "";
+	if (numbers.size() == 1) return to_string(numbers[0]);
+	string str="";
+	sort(numbers.begin(), numbers.end());
+	long long a, b;
+	a = numbers[0];
+	for (int i = 1; i < numbers.size(); i++) 
+	{
+		b = numbers[i];
+        if (pibjie(a,b))
+        {
+			a = a*pow(10,to_string(b).size()) + b;
+        }
+		else
+		{
+			a = b*pow(10,to_string(a).size()) + a;
+		}
+	}
+	return to_string(a);
+}
+
+string PrintMinNumber_v2(vector<int> numbers) {
+	string  answer = "";
+	sort(numbers.begin(), numbers.end(), pibjie);   //sort可以自己定制排序规则  排序规则必须要是静态函数
+	for (int i = 0; i < numbers.size(); i++) {
+		answer += to_string(numbers[i]);
+	}
+	return answer;
+}
+////////////////////////////////////////////////////////////////////
+int GetUglyNumber_Solution(int index) {            //丑数   都是由2，3，5为因子组成
+	if (index < 7)return index;
+	vector<int> res(index);
+	res[0] = 1;
+	int t2 = 0, t3 = 0, t5 = 0, i;
+	for (i = 1; i < index; ++i)
+	{
+		res[i] = min(res[t2] * 2, min(res[t3] * 3, res[t5] * 5));
+		if (res[i] == res[t2] * 2)t2++;
+		if (res[i] == res[t3] * 3)t3++;
+		if (res[i] == res[t5] * 5)t5++;
+	}
+	return res[index - 1];
+}
+///////////////////////////////////////////////////////////////////
+int FirstNotRepeatingChar(string str) {
+	if (str.size() == 0) return -1;
+	map<char, int> mapChar;
+	map<char, int>::iterator it;
+	for (int i = 0;i<str.size();i++)
+	{
+		char c = str[i];
+		it = mapChar.find(c);
+		if (it!=mapChar.end())
+		{
+			mapChar[c] = -1;
+		}
+		else
+		{
+			mapChar[char(c)] = i;
+		}
+	}
+	int min =10000;
+	for (auto ch:mapChar)
+	{
+		int index = ch.second;
+		if (index >=0)
+		{
+			min = min < index ? min : index;
+		}
+	}
+	return min;
+}
+
+int FirstNotRepeatingCharv2(string str)
+{
+	int len = str.size();
+	if (len <= 0)
+		return -1;
+	int cnt[100] = { 0 };
+	int i, res = -1;
+	for (i = 0; i < len; i++)
+	{
+		cnt[str[i] - 'A']++;
+	}
+	for (i = 0; i < len; i++)
+	{
+		if (cnt[str[i] - 'A'] == 1)
+		{
+			res = i;
+			break;
+		}
+	}
+	return res;
+}
+
+/////////////////////////////////////////////////////////
+ListNode* FindFirstCommonNode(ListNode* pHead1, ListNode* pHead2) {
+	int len1 = 0, len2 = 0;
+	ListNode* p1 = pHead1;
+	ListNode* p2 = pHead2;
+
+	while (p1)
+	{
+		len1++;
+		p1 = p1->next;
+	}
+	while (p2) 
+	{
+		len2++;
+		p2 = p2->next;
+	}
+	int d = len1 - len2;
+	if (d>0)
+	{
+		p1 = pHead1;
+		p2 = pHead2;
+	}
+	else
+	{
+		d = -d;
+		p1 = pHead2;
+		p2 = pHead1;
+	}
+
+	for (int i=0;i<d;i++)
+	{
+		p1 = p1->next;
+	}
+
+	while (p1!=NULL&&p2!=NULL)
+	{
+		if (p1 == p2)
+			break;
+		p1 = p1->next;
+		p2 = p2->next;
+	}
+	return p1;
+}
+
+//////////////////////////////////////////////////////////////////
+//查找某个有序数组的某个数字的出现字数
+int GetNumberOfK(vector<int> data, int k) 
+{
+	if (data.size() == 0) return 0;
+	int begin = 0;
+	int end = data.size() - 1;
+	int m = 0;
+	int n = 0;
+	while (begin <= end)
+	{
+		m = (begin + end) / 2;
+		if (data[m] > k)
+		{
+			end = m - 1;
+		}
+		else if (data[m] < k)
+		{
+			begin = m + 1;
+		}
+		else
+		{
+			break;
+		}
+	}
+	if (data[m] == k)
+	{
+		n = m;
+		while (m >= 0)
+		{
+			if (data[m] == k)
+			{
+				m--;
+			}
+			else {
+				m++;
+				break;
+			}
+		}
+		if (m == -1) m++;
+		while (n < data.size())
+		{
+			if (data[n]==k)
+			{
+				n++;
+			}
+			else
+		        break;
+		}
+	}
+	else 
+	{
+		return 0;
+	}
+	return n - m;
+}
+///////////////////////////////////////////////////////////////////////////
+int StrToInt(string str) {
+	if (str.size() == 0) return 0;
+	int sum = 0;
+	bool flag = true;
+	for (char c : str)
+	{
+		if (c=='-')
+		{
+			flag = false;
+		}
+		else if (c=='+')
+		{
+		    flag = true;
+		}
+		else if (c>='0'&&c<='9')
+		{
+			sum = sum * 10 + (c - '0');
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	if (flag) return sum;
+	else return -sum;
+}
+////////////////////////////////////////////////////////////////
+// Parameters:
+//        numbers:     an array of integers
+//        length:      the length of array numbers
+//        duplication: (Output) the duplicated number in the array number
+// Return value:       true if the input is valid, and there are some duplications in the array number
+//                     otherwise false
+bool duplicate(int numbers[], int length, int* duplication) {
+	vector<int> vec(length);
+	for (int i=0;i<length;i++)
+	{
+		vec[numbers[i]]++;
+	}
+	for (int i = 0; i < length; i++)
+	{
+		if (vec[numbers[i]]>1)
+		{
+			*duplication = numbers[i];
+			return true;
+		}
+	}
+	return false;
+}
+//////////////////////////////////////////////////////////////////
+//给定一个数组A[0,1,...,n-1],请构建一个数组B[0,1,...,n-1],其中B中的元素B[i]=A[0]*A[1]*...*A[i-1]*A[i+1]*...*A[n-1]。不能使用除法。
+vector<int> multiply(const vector<int>& A) {
+	int sum = 1;
+	vector<int> res(A.size());
+	int index, count = 0;
+	for (int i = 0;i<A.size();i++)
+	{
+		int a = A[i];
+		if (a==0)
+		{
+			index = i;
+			count++;
+			
+		}
+		else
+		{
+			sum *= a;
+		}
+	}
+	if (count>1)
+	{
+		return res;
+	}
+	else if (count==1)
+	{
+		res[index] = sum;
+	}
+	else
+	{
+		for (int i = 0; i<A.size(); i++)
+		{
+			int a = A[i];
+			int d = divide(sum, a);
+			res[i] = d;
+		}
+	}
+
+	return res;
+}
+
+//方法2
+vector<int> multiplyv2(const vector<int>& A) 
+{
+	int n = A.size();
+	vector<int> b0(n, 1);
+	vector<int> b1(n, 1);
+	for (int i=1;i<n;i++)
+	{
+		b0[i] = b0[i - 1] * A[i - 1];
+	}
+	for (int i = n-2;i>=0;i--)
+	{
+		b1[i] = b1[i + 1] * A[i + 1];
+	}
+	vector<int> b(n, 1);
+	for (int i =0;i<n;i++)
+	{
+		b[i] = b0[i] * b1[i];
+	}
+	return b;
+}
+///////////////////////////////////////////////////////////////////
+//请实现一个函数用来匹配包括'.'和'*'的正则表达式。模式中的字符'.'表示任意一个字符，而'*'表示它前面的字符可以出现任意次（包含0次）。 
+//在本题中，匹配是指字符串的所有字符匹配整个模式。例如，字符串"aaa"与模式"a.a"和"ab*ac*a"匹配，但是与"aa.a"和"ab*a"均不匹配
+/*
+	首先，考虑特殊情况：
+	1>两个字符串都为空，返回true
+	2>当第一个字符串不空，而第二个字符串空了，返回false（因为这样，就无法
+	匹配成功了,而如果第一个字符串空了，第二个字符串非空，还是可能匹配成
+	功的，比如第二个字符串是“a*a*a*a*”,由于‘*’之前的元素可以出现0次，
+	所以有可能匹配成功）
+	之后就开始匹配第一个字符，这里有两种可能：匹配成功或匹配失败。但考虑到pattern
+	下一个字符可能是‘*’， 这里我们分两种情况讨论：pattern下一个字符为‘*’或
+	不为‘*’：
+	1>pattern下一个字符不为‘*’：这种情况比较简单，直接匹配当前字符。如果
+	匹配成功，继续匹配下一个；如果匹配失败，直接返回false。注意这里的
+	“匹配成功”，除了两个字符相同的情况外，还有一种情况，就是pattern的
+	当前字符为‘.’,同时str的当前字符不为‘\0’。
+	2>pattern下一个字符为‘*’时，稍微复杂一些，因为‘*’可以代表0个或多个。
+	这里把这些情况都考虑到：
+	a>当‘*’匹配0个字符时，str当前字符不变，pattern当前字符后移两位，
+	跳过这个‘*’符号；
+	b>当‘*’匹配1个或多个时，str当前字符移向下一个，pattern当前字符
+	不变。（这里匹配1个或多个可以看成一种情况，因为：当匹配一个时，
+	由于str移到了下一个字符，而pattern字符不变，就回到了上边的情况a；
+	当匹配多于一个字符时，相当于从str的下一个字符继续开始匹配）
+	之后再写代码就很简单了。
+*/
+bool match(char* str, char* pattern)
+{
+	if (*str == '\0' && *pattern == '\0')
+		return true;
+	if (*str != '\0' && *pattern == '\0')
+		return false;
+
+	if (*(pattern+1)!='*')
+	{
+		if (*str == *pattern || (*str != '\0'&&*pattern == '.'))
+			return match(str + 1, pattern + 1);
+		else
+			return false;
+	}
+	else 
+	{
+		if (*str == *pattern || (*str != '\0'&&*pattern == '.')) 
+		{
+			return match(str, pattern + 2) || match(str + 1, pattern);
+		}
+		else
+		{
+			return match(str, pattern + 2);
+		}
+	}
+}
+
+//请实现一个函数用来判断字符串是否表示数值（包括整数和小数）。例如，字符串"+100","5e2","-123","3.1416"和"-1E-16"都表示数值。
+//但是"12e","1a3.14","1.2.3","+-5"和"12e+4.3"都不是。
+//首先判断是否有符号（ + 或者 - ），如果有，则对后面的字符串判断
+//首先需要扫描数字直到结束或是遇到其他字符，结束则返回true，否则继续按情况判断下一个需要判断的字符
+//
+//如果是小数点'.'，是则扫描数字，直到结束（返回true）或者遇到特殊字符，如果是e或E，那么对后面的数判断是否符合指数表示，如果是其他字符则返回false。
+//如果是e或者E，那么对后面的数判断是否符合指数表示。
+//如果不符合上面的情况则返回false
+//指数判断：
+//首先判断是否是符号，如果是，跳到下一位判断后面的是否是数字组成的串，是则表示指数表示是正确的，否则是不正确的。
+int indexOfStr(char* string) 
+{
+	int index = 0;
+	while (*string >= '0'&&*string <= '9')
+	{
+		index++;
+		string++;
+	}
+	return index;
+}
+
+bool isExponential(char* string) 
+{
+	if (*string!='\0')
+	{
+		if (*string == '+' || *string == '-') string++;
+		int index = indexOfStr(string);
+		string += index;
+		if (*string == '\0') return true;
+		return false;
+	}
+	return false;
+}
+
+bool isNumeric(char* string)
+{
+	if (string == NULL) return false;
+	if (*string == '+' || *string == '-')
+		string++;
+	if (*string == '\0') return false;
+	int index = indexOfStr(string);
+	string += index;
+	if (*string!='\0')
+	{
+		if (*string =='.')
+		{
+			string++;
+			int index2 = indexOfStr(string);
+			string += index2;
+			if (*string!='\0')
+			{
+				if (*string=='e'||*string=='E')
+				{
+					string++;
+					return isExponential(string);
+				}
+				return false;
+			}
+			return true;
+		}
+		else if (*string == 'e' || *string == 'E')
+		{
+			string++;
+			return isExponential(string);
+		}
+		return false;
+	}
+	return true;
+
+}
+
+//请实现一个函数用来找出字符流中第一个只出现一次的字符。例如，当从字符流中只读出前两个字符"go"时，第一个只出现一次的字符是"g"。
+//当从该字符流中读出前六个字符“google"时，第一个只出现一次的字符是"l"。
+//Insert one char from stringstream
+string strForFirstAppear="";
+//vector<int> countOfChars(128,0);  这句不行  换成下一句可以  //不知道为什么
+int countOfChars[128] = { 0 };
+void Insert(char ch)
+{
+	strForFirstAppear += ch;
+	countOfChars[ch]++;
+}
+//return the first appearence once char in current stringstream
+char FirstAppearingOnce()
+{
+	int size = strForFirstAppear.size();
+	for(int i=0;i<size;i++)
+	{
+		if (countOfChars[strForFirstAppear[i]] == 1) return strForFirstAppear[i];
+	}
+	return '#';
+}
+
+//给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出null。
+//https://www.nowcoder.com/questionTerminal/253d2c59ec3e4bc68da16833f79a38e4
+ListNode* EntryNodeOfLoop(ListNode* pHead)
+{
+	if (pHead == NULL||pHead->next==NULL) return NULL;
+	ListNode* p1 = pHead;
+	ListNode* p2 = pHead;
+
+	while (p1->next!=NULL&&p2->next!=NULL)
+	{
+		p1 = p1->next;
+		p2 = p2->next->next;
+		if (p1==p2)
+		{
+			p2 = pHead;
+			while (p1!=p2)
+			{
+				p1 = p1->next;
+				p2 = p2->next;
+			}
+			if (p1==p2)
+			{
+				return p1;
+			}
+		}
+	}
+	return NULL;
+}
+
+//在一个排序的链表中，存在重复的结点，请删除该链表中重复的结点，重复的结点不保留，返回链表头指针。 
+//例如，链表1->2->3->3->4->4->5 处理后为 1->2->5
+ListNode* deleteDuplication(ListNode* pHead)
+{
+	if (pHead == NULL || pHead->next == NULL) return pHead;
+	bool flag = false;
+	bool head = false;
+	ListNode* pre = pHead;
+	ListNode* pNode = pHead;
+	
+
+	while (pNode->next!=NULL)
+	{
+		if (pNode->val== pNode->next->val)
+		{
+			flag = true;
+			pNode->next = pNode->next->next;
+		}
+		else
+		{
+			if (head)
+			{
+				if (flag)
+				{
+					flag = false;
+					pre->next = pNode->next;
+				}
+				else
+				{
+					pre = pNode;
+				}
+			}
+			else
+			{
+				if (flag)
+				{
+					flag = false;
+				}
+				else
+				{
+					pHead = pNode;
+					head = true;
+					pre = pHead;
+				}
+			}
+			pNode = pNode->next;
+
+		}
+	}
+	if (flag && (!head)) return NULL;
+	if (flag&&head) pre->next = NULL;
+	if (!head) return pNode;
+	return pHead;
+}
+
+
+//遍历单链表
+void coutListNode(ListNode* head) 
+{
+	ListNode* p = head;
+	while (p != NULL)
+	{
+		cout << p->val <<"    ";
+		p = p->next;
+	}
+	cout << endl;
+}
+//新建链表
+ListNode* newListNode(vector<int> vec) 
+{
+	if (vec.size() <= 0) return NULL;
+	ListNode* head = new ListNode(vec[0]);
+	ListNode* p = head;
+    for (int i =1;i<vec.size();i++)
+    {
+		ListNode* n = new ListNode(vec[i]);
+		p->next = n;
+		p = n;
+    }
+	return head;
+}
+
+//给定一个二叉树和其中的一个结点，请找出中序遍历顺序的下一个结点并且返回。
+//注意，树中的结点不仅包含左右子结点，同时包含指向父结点的指针。
+TreeLinkNode* GetNext(TreeLinkNode* pNode)
+{
+	if (pNode == NULL) return NULL;
+	if (pNode->right!=NULL)
+	{
+		pNode = pNode->right;
+		while (pNode->left != NULL)
+		{
+			pNode = pNode->left;
+		}
+		return pNode;
+	}
+	while (pNode->next!=NULL)
+	{
+		TreeLinkNode* p = pNode->next;
+		if (p->left==pNode)
+		{
+			return p;
+		}
+		pNode = pNode->next;
+	}
+	return NULL;
+}
+
+//请实现一个函数，用来判断一颗二叉树是不是对称的。注意，如果一个二叉树同此二叉树的镜像是同样的，定义其为对称的。
+//方法1
+bool isSymmetrical1(TreeNode* p1, TreeNode* p2) 
+{
+	if (p1 == NULL&&p2 == NULL) return true;
+	if (p1 == NULL || p2 == NULL) return false;
+	if (p1->val != p2->val) return false;
+
+	return isSymmetrical1(p1->left, p2->right) && isSymmetrical1(p1->right, p2->left);
+
+}
+bool isSymmetrical(TreeNode* pRoot)
+{
+	return isSymmetrical1(pRoot, pRoot);
+}
+//方法2
+bool isSymmetrical2(TreeNode* pRoot) 
+{
+	if (pRoot == NULL) return true;
+	stack<TreeNode*> st;
+	st.push(pRoot->left);
+	st.push(pRoot->right);
+	while (!st.empty())
+	{
+		TreeNode* left = st.top();
+		st.pop();
+		TreeNode* right = st.top();
+		st.pop();
+		if (left == NULL&&right == NULL) continue;
+		if (left == NULL || right == NULL) return false;
+		if (left->val != right->val) return false;
+		st.push(left->left);
+		st.push(right->right);
+		st.push(left->right);
+		st.push(right->left);
+	}
+	return true;
+}
+
+//请实现一个函数按照之字形打印二叉树，即第一行按照从左到右的顺序打印，第二层按照从右至左的顺序打印，第三行按照从左到右的顺序打印，其他行以此类推。
+vector<vector<int> > Print(TreeNode* pRoot) {
+	queue<TreeNode *> quetree;
+	vector<vector<int> > res;
+	bool rightBegin= false;
+	if (pRoot == NULL)
+	{
+		return res;
+	}
+	quetree.push(pRoot);
+	while (!quetree.empty())
+	{
+		int length = quetree.size();
+		vector<int> vec;
+		while (length > 0)
+		{
+			TreeNode *p = quetree.front();
+			quetree.pop();
+			vec.push_back(p->val);
+			if (p->left) quetree.push(p->left);
+			if (p->right) quetree.push(p->right);
+
+			length--;
+		}
+		if (rightBegin)
+		{
+			reverse(vec.begin(), vec.end());
+			rightBegin = false;
+		}
+		else
+			rightBegin = true;
+		res.push_back(vec);
+	}
+	return res;
+}
+
+//从上到下按层打印二叉树，同一层结点从左至右输出。每一层输出一行。
+vector<vector<int> > Print(TreeNode* pRoot) {
+	queue<TreeNode *> quetree;
+	vector<vector<int> > res;
+	if (pRoot == NULL)
+	{
+		return res;
+	}
+	quetree.push(pRoot);
+	while (!quetree.empty())
+	{
+		int length = quetree.size();
+		vector<int> vec;
+		while (length > 0)
+		{
+			TreeNode *p = quetree.front();
+			quetree.pop();
+			vec.push_back(p->val);
+			if (p->left) quetree.push(p->left);
+			if (p->right) quetree.push(p->right);
+
+			length--;
+		}
+		res.push_back(vec);
+	}
+	return res;
+}
+
+//请实现两个函数，分别用来序列化和反序列化二叉树
+//什么叫序列化啊。。。。。
+void Serialize_f(TreeNode* root, string &s) 
+{
+	if (root == NULL) s += "#";
+
+}
+
+char* Serialize(TreeNode *root) {
+	string s = "";
+	if (root == NULL) return "";
+
+}
+TreeNode* Deserialize(char *str) {
+
+}
 
 int main() 
 {
@@ -1120,12 +1995,17 @@ int main()
 	{ 5,6,7,8 },
 	{ 9,10,11,12 },
 	{ 13,14,15,16 }};
-	vector<int> vec = { 1,2,3,4,5,6,7 };
-	vector<int> vec1 = { 1,2,3,7,5,6,4 };
-	//vector<int> res = printMatrix(vecIntS);
-	bool r = IsPopOrder(vec, vec1);
+	vector<int> vec = { 3334,3,3333332 };
+	vector<int> vec1 = { 1,1,2,2,2,3,3,3,4,4,5 };
+	string str = "-1233aad234";
+	char* string = "12e";
+	//vector<int> res = multiplyv2(vec1);
+	//bool r = isNumeric(string);
 	//coutVec1d(res);
-	cout << r << endl;
+	//cout << '\0' << endl;
+	ListNode* pNode = newListNode(vec1);
+	ListNode* res = deleteDuplication(pNode);
+	coutListNode(res);
 	system("pause");
 	return 0;
-}
+} 
