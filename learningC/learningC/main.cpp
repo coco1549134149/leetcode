@@ -21,6 +21,28 @@ struct ListNode {
 	ListNode(int x) : val(x), next(NULL) {}
 };
 
+void coutVec2d(vector<vector<int>> vec)
+{
+	for (int i = 0; i < vec.size(); i++)
+	{
+		for (int j = 0; j < vec[i].size(); j++)
+		{
+			cout << vec[i][j] << "  ";
+		}
+		cout << endl;
+	}
+}
+
+void coutVec1d(vector<int> vec)
+{
+	for (int i = 0; i < vec.size(); i++)
+	{
+		cout << vec[i] << "  ";
+
+	}
+	cout << endl;
+}
+
 ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
 	int sum=0;
 	int baseNum = 0;
@@ -1022,11 +1044,52 @@ int peakIndexInMountainArray(vector<int>& A) {
 	return 0;
 }
 
+vector<int> sortArrayByParity(vector<int>& A) {
+	int i, j;
+	int _size = A.size();
+	for (i = 0, j = _size - 1; i < j;)
+	{
+		while (i<_size&&A[i] % 2 == 0 ) i++;
+		while (j>=0&&A[j] % 2 == 1) j--;
+		if (i<j)
+		{
+			int temp = A[i];
+			A[i] = A[j];
+			A[j] = temp;
+			i++;
+			j--;
+		}
+		
+	}
+	return A;
+}
+
+void reverseString(vector<char>& s) {
+	reverse(s.begin(), s.end());
+}
+
+static bool check(char c) {
+	if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' ||
+		c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U') {
+		return true;
+	}
+	return false;
+}
+
+string reverseVowels(string s) {
+	int i, j;
+	for (i=0,j=s.size()-1;i<j;)
+	{
+	}
+}
+
 int main()
 {
-	vector<int> B = { 1,2,3,4,5,6,7,6,5,4,3 };
-	int a = peakIndexInMountainArray(B);
-	cout << a << endl;
+	vector<int> B = { 0,2 };
+	vector<int> A = sortArrayByParity(B);
+	coutVec1d(A);
+	coutVec1d(B);
+	//cout << a << endl;
 	system("pause");
 	return 0;
 }
