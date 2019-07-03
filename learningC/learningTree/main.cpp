@@ -2109,6 +2109,66 @@ TreeNode* KthNode_3(TreeNode* pRoot, int k)
 	}
 	return NULL;
 }
+
+int climbStairs(int n) {
+	if (n == 0) return 1;
+	if (n == 1) return 1;
+	return climbStairs(n - 1) + climbStairs(n - 2);
+}
+// ì³²¨ÄÇÆõ¹«Ê½
+int Fibonacci_argn(int n) 
+{
+	double sqrt5 = sqrt(5);
+	double fibn = pow((1 + sqrt5) / 2, n + 1) - pow((1 - sqrt5) / 2, n + 1);
+	return (int)(fibn / sqrt5);
+
+
+	//Á´½Ó£ºhttps ://leetcode-cn.com/problems/two-sum/solution/pa-lou-ti-c-by-gpe3dbjds1/
+
+}
+
+
+//ÅÐ¶ÏÊÇ·ñ¶þ²æËÑË÷Ê÷
+long cur = -2147483649;
+bool isValidBST(TreeNode* root) {
+	if (root == NULL) return true;
+	if (root->left == NULL&&root->right == NULL)
+	{
+		if (root->val>cur)
+		{
+			cur = root->val;	
+			return true;
+		}
+		
+	}
+	bool left = true, right = true, curr = true;
+	if (root->left) left = isValidBST(root->left);
+	if (root->val > cur)
+	{
+		curr = true;
+		cur = root->val;
+	}
+	else
+	{
+		return false;
+	}
+	if (root->right) right = isValidBST(root->right);
+
+	return curr&&left&&right;
+}
+
+bool isValidBST_v2(TreeNode* root) {
+	static TreeNode* prev;
+	if (root!=NULL)
+	{
+		if (!isValidBST(root->left)) return false;
+		if (prev != NULL&&prev->val >= root->val) return false;
+		prev = root;
+		if (!isValidBST(root->right)) return false;
+	}
+	return true;
+}
+
 int main() 
 {
 	vector<vector<int>> vecIntS = { 
