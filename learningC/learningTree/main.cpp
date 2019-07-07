@@ -1944,7 +1944,7 @@ vector<vector<int> > Print(TreeNode* pRoot) {
 }
 
 //从上到下按层打印二叉树，同一层结点从左至右输出。每一层输出一行。
-vector<vector<int> > Print(TreeNode* pRoot) {
+vector<vector<int> > Print_2(TreeNode* pRoot) {
 	queue<TreeNode *> quetree;
 	vector<vector<int> > res;
 	if (pRoot == NULL)
@@ -1975,17 +1975,198 @@ vector<vector<int> > Print(TreeNode* pRoot) {
 //什么叫序列化啊。。。。。
 void Serialize_f(TreeNode* root, string &s) 
 {
-	if (root == NULL) s += "#";
-
+	if (root == NULL)
+	{
+		s += "#";
+		return;
+	}
+	string r = to_string(root->val);
+	s += r;
+	s += ',';
+	Serialize_f(root->left, s);
+	Serialize_f(root->right, s);
 }
 
 char* Serialize(TreeNode *root) {
 	string s = "";
-	if (root == NULL) return "";
+	if (root == NULL) return NULL;
+	Serialize_f(root, s);
+	char* str = new char[s.length() + 1];
+	int i;
+	for (i=0;i<s.length();i++)
+	{
+		str[i] = s[i];
+	}
+	str[i] = '\0';
+	return str;
+}
+TreeNode* Deserialize_f(char **str)
+{
+	if (**str =='#')
+	{
+		(*str)++;
+		return NULL;
+	}
+	int num = 0;
+	while (**str!='\0'&&**str!=',')
+	{
+		num = num * 10 + ((**str) - '0');  //防止有多位数  比如上升到 十位 百位
+		++(*str);
+
+	}
+	TreeNode *root = new TreeNode(num);
+	if (**str == '\0')
+		return root;
+	else
+		(*str)++;
+	root->left = Deserialize_f(str);
+	root->right = Deserialize_f(str);
+	return root;
+}
+
+TreeNode* Deserialize(char *str) {
+	if (str == NULL) return NULL;
+	TreeNode* res = Deserialize_f(&str);
+	return res;
+}
+
+
+//给定一棵二叉搜索树，请找出其中的第k小的结点。例如， （5，3，7，2，4，6，8）    中，按结点数值大小顺序第三小结点的值为4。
+
+static bool compareTreeNode(TreeNode* p1, TreeNode* p2) 
+{
+	if (p1->val <= p2->val) return true;
+	return false;
+}
+
+void binKthNode(TreeNode* pRoot, vector<TreeNode*>& vec) 
+{
+	if (pRoot == NULL) return;
+	while (pRoot)
+	{
+		vec.push_back(pRoot);
+		binKthNode(pRoot->left,vec);
+		binKthNode(pRoot->right,vec);
+	}
+}
+
+TreeNode* KthNode(TreeNode* pRoot, int k)
+{
+	vector<TreeNode*> vec;
+	binKthNode(pRoot, vec);
+	sort(vec.begin(), vec.end(), compareTreeNode);
+	return vec[k - 1];
+}
+//以上方法会超出内存  但是是针对无序的搜索树  且消耗内存
+//方法2  忘记看是二叉搜索树了  递归 每次都是k-1  中序递归
+
+vector<TreeNode*> vecTree;
+TreeNode* KthNode_2(TreeNode* pRoot, int k)
+{
+	if (pRoot == NULL) return NULL;
+	if (pRoot->left) return KthNode_2(pRoot->left, k);
+	if (vecTree.size()!=k)
+	{
+		vecTree.push_back(pRoot);
+	}
+	else 
+	{
+		return vecTree[k - 1];
+	}
+	if (pRoot->right) return KthNode_2(pRoot->right, k);
+	return NULL;
+}
+
+//以上递归的方法耗内存 不能通过牛客
+//方法3  非递归 用stack
+TreeNode* KthNode_3(TreeNode* pRoot, int k)
+{
+	if (pRoot == NULL) return NULL;
+
+	stack<TreeNode*> stTree;
+	TreeNode* p = pRoot;
+	int count = 0;
+	while (p != NULL||!stTree.empty())
+	{
+		while (p) 
+		{
+			stTree.push(p);
+			p = p->left;
+		}
+
+		if (!stTree.empty())
+		{
+			p = stTree.top();
+			stTree.pop();
+			if (count == k - 1)
+			{
+				return p;
+			}
+			p = p->right;
+			
+			count++;
+		}
+	}
+	return NULL;
+}
+
+int climbStairs(int n) {
+	if (n == 0) return 1;
+	if (n == 1) return 1;
+	return climbStairs(n - 1) + climbStairs(n - 2);
+}
+// 斐波那契公式
+int Fibonacci_argn(int n) 
+{
+	double sqrt5 = sqrt(5);
+	double fibn = pow((1 + sqrt5) / 2, n + 1) - pow((1 - sqrt5) / 2, n + 1);
+	return (int)(fibn / sqrt5);
+
+
+	//链接：https ://leetcode-cn.com/problems/two-sum/solution/pa-lou-ti-c-by-gpe3dbjds1/
 
 }
-TreeNode* Deserialize(char *str) {
 
+
+//判断是否二叉搜索树
+long cur = -2147483649;
+bool isValidBST(TreeNode* root) {
+	if (root == NULL) return true;
+	if (root->left == NULL&&root->right == NULL)
+	{
+		if (root->val>cur)
+		{
+			cur = root->val;	
+			return true;
+		}
+		
+	}
+	bool left = true, right = true, curr = true;
+	if (root->left) left = isValidBST(root->left);
+	if (root->val > cur)
+	{
+		curr = true;
+		cur = root->val;
+	}
+	else
+	{
+		return false;
+	}
+	if (root->right) right = isValidBST(root->right);
+
+	return curr&&left&&right;
+}
+
+bool isValidBST_v2(TreeNode* root) {
+	static TreeNode* prev;
+	if (root!=NULL)
+	{
+		if (!isValidBST(root->left)) return false;
+		if (prev != NULL&&prev->val >= root->val) return false;
+		prev = root;
+		if (!isValidBST(root->right)) return false;
+	}
+	return true;
 }
 
 int main() 

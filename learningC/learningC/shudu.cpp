@@ -27,24 +27,24 @@ int statusB[9];									//九宫格状态
 
 bool test = false;
 
-int main(int argc, char *argv[]) {
-	int startTime = clock();
-
-	int j;
-	if (argc > 1) for (j = 0; j < 81; j++) sudoku[j] = argv[1][j] - '0';
-	else exit(0);
-
-	printf("------------------\n");
-	printSudoku(sudoku);
-	init();                                     // 初始设定
-	tryAns2();                                   // 测试求解
-	printf("------------------\n");
-	printSudoku(sudoku);
-	printf("------------------\n");
-
-	int endTime = clock();
-	printf("use time,%d\n", (endTime - startTime));
-}
+//int main(int argc, char *argv[]) {
+//	int startTime = clock();
+//
+//	int j;
+//	if (argc > 1) for (j = 0; j < 81; j++) sudoku[j] = argv[1][j] - '0';
+//	else exit(0);
+//
+//	printf("------------------\n");
+//	printSudoku(sudoku);
+//	init();                                     // 初始设定
+//	tryAns2();                                   // 测试求解
+//	printf("------------------\n");
+//	printSudoku(sudoku);
+//	printf("------------------\n");
+//
+//	int endTime = clock();
+//	printf("use time,%d\n", (endTime - startTime));
+//}
 
 int init() {
 	//初始状态值
@@ -66,6 +66,7 @@ int init() {
 			markStatus(indexV, indexH, indexB, number);
 		}
 	}
+	return 0;
 }
 
 int printSudoku(int *prn) {
@@ -74,6 +75,7 @@ int printSudoku(int *prn) {
 		printf("%2d", prn[i]);
 		if (i % 9 == 8) printf("\n");
 	}
+	return 0;
 }
 
 int tryAns2() {
@@ -167,6 +169,7 @@ int check(int sp, int indexV, int indexH, int indexB) {
 int push(int sp) {
 	// 將指定的位置放入堆疊中
 	tempNum[tempSp++] = sp;
+	return 0;
 }
 
 int pop() {
