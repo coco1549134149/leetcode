@@ -1275,6 +1275,7 @@ bool pibjie(int a, int b)
 	B += to_string(a);
 	return A < B;
 }
+	
 string PrintMinNumber(vector<int> numbers) {
 	if (numbers.size() == 0) return "";
 	if (numbers.size() == 1) return to_string(numbers[0]);
@@ -1297,11 +1298,115 @@ string PrintMinNumber(vector<int> numbers) {
 	return to_string(a);
 }
 
+string PrintMaxNumber(vector<int> numbers) {
+	if (numbers.size() == 0) return "";
+	if (numbers.size() == 1) return to_string(numbers[0]);
+	string str = "";
+	sort(numbers.begin(), numbers.end());
+	long long a, b;
+	a = numbers[0];
+	for (int i = 1; i < numbers.size(); i++)
+	{
+		b = numbers[i];
+		if (!pibjie(a, b))
+		{
+			a = a*pow(10, to_string(b).size()) + b;
+		}
+		else
+		{
+			a = b*pow(10, to_string(a).size()) + a;
+		}
+	}
+	return to_string(a);
+}
+
+int compare(char a[], char b[])  //比较大数
+{
+	int lena = strlen(a);
+	int lenb = strlen(b);
+	if (lena > lenb)
+		return 1;
+	else if (lena < lenb)
+		return 0;
+	for (int i = 0; i < lena; i++)
+	{
+		if (a[i] > b[i])
+			return 1;
+		else if (a[i] < b[i])
+			return 0;
+	}
+	return 2;
+}
+//处理大数  用string  拼接后比较；
+
+bool pinjieBigInt(string a, string b)
+{
+	string A = "";
+	string B = "";
+	A += a;
+	A += b;
+	B += b;
+	B += a;
+
+
+	for (int i = 0; i < A.size(); i++)
+	{
+		if (A[i] > B[i])
+			return true;
+		else if (A[i] < B[i])
+			return false;
+	}
+	return false;
+}
+
+string PrintMaxBigNumber(vector<int> numbers) 
+{
+	if (numbers.size() == 0) return "";
+	if (numbers.size() == 1) return to_string(numbers[0]);
+	string str = "";
+	sort(numbers.begin(), numbers.end());
+	vector<string> strInt;
+	for (int i : numbers) 
+	{
+		strInt.push_back(to_string(i));
+	}
+	
+	string a, b;
+	a = strInt[0];
+	for (int i = 1; i < strInt.size(); i++)
+	{
+		b = strInt[i];
+		if (pinjieBigInt(a, b))
+		{
+			a = a + b;
+		}
+		else
+		{
+			a = b + a;
+		}
+	}
+	if (a[0]=='0')
+	{
+		return "0";
+	}
+	return a;
+}
+
+
 string PrintMinNumber_v2(vector<int> numbers) {
 	string  answer = "";
-	sort(numbers.begin(), numbers.end(), pibjie);   //sort可以自己定制排序规则  排序规则必须要是静态函数
+	sort(numbers.begin(), numbers.end(), pibjie);   //sort可以自己定制排序规则  排序规则在leetcode上必须要是静态函数
 	for (int i = 0; i < numbers.size(); i++) {
 		answer += to_string(numbers[i]);
+	}
+	return answer;
+}
+
+string PrintMaxBigIntNumber_v2(vector<string> numbers) {
+	string answer = "";
+	sort(numbers.begin(), numbers.end(), pinjieBigInt);   
+	for (int i = 0; i < numbers.size(); i++) {
+		answer += numbers[i];
 	}
 	return answer;
 }
@@ -2178,15 +2283,19 @@ int main()
 	{ 13,14,15,16 }};
 	vector<int> vec = { 3334,3,3333332 };
 	vector<int> vec1 = { 1,1,2,2,2,3,3,3,4,4,5 };
-	string str = "-1233aad234";
-	char* string = "12e";
-	//vector<int> res = multiplyv2(vec1);
-	//bool r = isNumeric(string);
-	//coutVec1d(res);
-	//cout << '\0' << endl;
-	ListNode* pNode = newListNode(vec1);
-	ListNode* res = deleteDuplication(pNode);
-	coutListNode(res);
+	int num = 0;
+	vector<int> array;
+	cin >> num;
+	for (int i = 0;i<num;i++)
+	{
+		int a;
+		cin >> a;
+		cout << a << endl;
+		array.push_back(a);	
+	}
+	cout << array.size() << endl;
+	string res = PrintMaxBigIntNumber_v2(array);
+	cout << res;
 	system("pause");
 	return 0;
 } 
