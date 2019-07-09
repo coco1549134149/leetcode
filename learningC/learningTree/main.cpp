@@ -12,6 +12,7 @@
 #include <queue>
 #include <functional>
 #include "commonFunc.h"
+#include "intStream.h"
 #pragma comment(lib, "Ws2_32")
 using namespace std;
 
@@ -2273,6 +2274,173 @@ bool isValidBST_v2(TreeNode* root) {
 	}
 	return true;
 }
+//最大子序和
+int maxSubArray(vector<int>& nums) {
+	int max = INT_MIN;
+	int sum = 0;
+	for (int i : nums)
+	{
+		sum += i;
+		if (sum>max)
+		{
+			max = sum;
+		}
+		if (sum<=0)
+		{
+			sum = 0;
+		}
+	}
+	return max;
+}
+//无效化ip地址   就是将 . 变成 [.]
+string defangIPaddr(string address) {
+	string str = "";
+	for (char s : address)
+	{
+		if (s != '.')
+		{
+			str += s;
+		}
+		else
+			str += "[.]";
+	}
+	return str;
+}
+
+////////////////////////////////////////////股票问题////////////////////////////////////////////////
+//只能交易一次
+int maxProfit(vector<int>& prices) {
+	int minPrice = INT_MAX;
+	int profit = 0;
+	for (int i : prices)
+	{
+		if (i<minPrice)
+		{
+			minPrice = i;
+		}
+		else if(i-minPrice>profit)
+		{
+			profit = i - minPrice;
+		}
+		
+	}
+	return profit;
+}
+
+
+
+//柠檬水找零
+bool lemonadeChange(vector<int>& bills) {
+	int five = 0;
+	int ten = 0;
+	int twen = 0;
+	for (int i : bills)
+	{
+		if (i==5)
+		{
+			five++;
+		}
+		if (i ==10)
+		{
+			ten++;
+			five--;
+		}
+		if (i ==20)
+		{
+			if (ten>0)
+			{
+				ten--;
+				five--;
+			}
+			else 
+			{
+				five = five - 3;
+			}
+			twen++;
+		}
+
+		if (five<0||ten<0||twen<0)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+//分发饼干
+int findContentChildren(vector<int>& g, vector<int>& s) {
+	sort(g.begin(), g.end());
+	sort(s.begin(), s.end());
+	int sum = 0;
+	int i = 0;
+	int j = 0;
+	for (; i < g.size()&&j < s.size();j++) 
+	{
+		if (s[j] >= g[i]) 
+		{
+			sum++;
+			i++;
+		}
+
+	}
+	return sum;
+}
+//滑动窗口最大和
+vector<int> maxInWindows(const vector<int>& num, unsigned int size)
+{
+	vector<int> res;
+	int start = 0;
+	if (size > num.size())
+	{
+		return res;
+	}
+	int sum = 0;
+	for (int i = 0;i<size;i++)
+	{
+		sum += num[i];
+	}
+	int max = sum;
+	int i = 1;
+	int j = size;
+	for (;j<num.size();j++,i++)
+	{
+		int dif = num[j] - num[i];
+		sum += dif;
+		if (sum>max)
+		{
+			max = sum;
+			start = i;
+		}
+	}
+	for (int n = 0;n<size;n++)
+	{
+		res.push_back(num[start + n]);
+	}
+	return res;
+}
+
+vector<int> maxInWindows_1(const vector<int>& num, unsigned int size)
+{
+	vector<int>max;
+	if (num.empty() || size > num.size() || size < 1)
+		return max;
+	int m;
+	for (int i = 0; i < num.size() - size + 1; i++)
+	{
+		m = num[i];
+		for (int j = i + 1; j < i + size; j++)
+		{
+
+			if (num[j] > m)
+			{
+				m = num[j];
+			}
+		}
+		max.push_back(m);
+	}
+
+	return max;
+}
 
 int main() 
 {
@@ -2281,11 +2449,11 @@ int main()
 	{ 5,6,7,8 },
 	{ 9,10,11,12 },
 	{ 13,14,15,16 }};
-	vector<int> vec = { 3334,3,3333332 };
-	vector<int> vec1 = { 1,1,2,2,2,3,3,3,4,4,5 };
+	vector<int> vec = { 5,2,3,4,1,6,7,0,8 };
+	vector<int> vec1 = { 1,2 };
 	int num = 0;
 	vector<int> array;
-	cin >> num;
+	/*cin >> num;
 	for (int i = 0;i<num;i++)
 	{
 		int a;
@@ -2293,9 +2461,23 @@ int main()
 		cout << a << endl;
 		array.push_back(a);	
 	}
+	vector<string> strInt;
 	cout << array.size() << endl;
-	string res = PrintMaxBigIntNumber_v2(array);
-	cout << res;
+	for (int i : array)
+	{
+		strInt.push_back(to_string(i));
+	}
+	string res = PrintMaxBigIntNumber_v2(strInt);*/
+
+	intStream_1 m_intStream;
+	for (int i : vec)
+	{
+		m_intStream.Insert(i);
+		double res = m_intStream.GetMedian();
+		cout << res << "   i: " << i << endl;;
+	}
+	
+
 	system("pause");
 	return 0;
 } 
