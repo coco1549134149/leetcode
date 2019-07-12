@@ -2442,6 +2442,42 @@ vector<int> maxInWindows_1(const vector<int>& num, unsigned int size)
 	return max;
 }
 
+bool isHsaPath(char *matrix, int rows, int cols, char *str, bool *isOk, int curx,int cury)
+{
+	if (*str == '\0') return true;
+	if (cury == cols)
+	{
+		curx++;
+		cury = 0;
+	}
+	if (cury==-1)
+	{
+		curx--;
+		cury = cols - 1;
+	}
+	if (curx < 0 || cury >= rows) return false;
+	if (isOk[curx*cols + cury] || *str != matrix[curx*cols + cury]) return false;
+
+	isOk[curx*cols + cury] = true;
+	bool sign =
+		isHsaPath(matrix, rows, cols, str + 1, isOk, curx - 1, cury) ||
+		isHsaPath(matrix, rows, cols, str + 1, isOk, curx + 1, cury) ||
+		isHsaPath(matrix, rows, cols, str + 1, isOk, curx, cury - 1) ||
+		isHsaPath(matrix, rows, cols, str + 1, isOk, curx, cury + 1);
+	isOk[curx*cols + cury] = false;
+	return sign;
+}
+
+bool hasPath(char *matrix, int rows, int cols, char *str) {
+	if (str == NULL || rows <= 0 || cols <= 0) return false;
+	bool *isOk = new bool[rows * cols]();
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++)
+			if (isHsaPath(matrix, rows, cols, str, isOk, i, j)) return true;
+	}
+	return false;
+}
+
 int main() 
 {
 	vector<vector<int>> vecIntS = { 
@@ -2453,30 +2489,12 @@ int main()
 	vector<int> vec1 = { 1,2 };
 	int num = 0;
 	vector<int> array;
-	/*cin >> num;
-	for (int i = 0;i<num;i++)
-	{
-		int a;
-		cin >> a;
-		cout << a << endl;
-		array.push_back(a);	
-	}
-	vector<string> strInt;
-	cout << array.size() << endl;
-	for (int i : array)
-	{
-		strInt.push_back(to_string(i));
-	}
-	string res = PrintMaxBigIntNumber_v2(strInt);*/
 
-	intStream_1 m_intStream;
-	for (int i : vec)
-	{
-		m_intStream.Insert(i);
-		double res = m_intStream.GetMedian();
-		cout << res << "   i: " << i << endl;;
-	}
-	
+	float a = 0.0f;
+	cout << (int)a << endl;
+	cout << &a << endl;
+	cout << (int&)a << endl;
+	cout << ((int)a == (int&)a)<<endl;
 
 	system("pause");
 	return 0;
