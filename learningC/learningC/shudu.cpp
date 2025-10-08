@@ -1,6 +1,6 @@
-// Êı¶ÀÎ»ÔËËã°æ±¾
-//±àÒëºó£¬ÔÚÃüÁîÁĞÖĞ½«µ¥ÁĞ¸ñÊ½Êı¶À·ÅÔÚ²ÎÊıÖĞ
-//Àı£º sudoku 802609051000800600000000049050200008008563900900007030530000000001008000480705203
+// æ•°ç‹¬ä½è¿ç®—ç‰ˆæœ¬
+//ç¼–è¯‘åï¼Œåœ¨å‘½ä»¤åˆ—ä¸­å°†å•åˆ—æ ¼å¼æ•°ç‹¬æ”¾åœ¨å‚æ•°ä¸­
+//ä¾‹ï¼š sudoku 802609051000800600000000049050200008008563900900007030530000000001008000480705203
 #include <stdio.h>
 #include <stdlib.h>
 #include "time.h"
@@ -17,13 +17,13 @@ int findNumber(int indexV, int indexH, int indexB, int skipValue);
 int markStatus(int indexV, int indexH, int indexB, int number);
 int resetStatus(int indexV, int indexH, int indexB, int number);
 
-int sudoku[81];                                // ”µªšî}Ä¿ê‡ÁĞ
-int tempNum[81];                               // ÉÏÒ»´ÎÌîÊıÎ»ÖÃ
-int tempSp = 0;                                 // ÉÏÒ»´ÎÌîÊıÎ»ÖÃÖ¸±ê
+int sudoku[81];                                // æ•¸ç¨é¡Œç›®é™£åˆ—
+int tempNum[81];                               // ä¸Šä¸€æ¬¡å¡«æ•°ä½ç½®
+int tempSp = 0;                                 // ä¸Šä¸€æ¬¡å¡«æ•°ä½ç½®æŒ‡æ ‡
 
-int statusH[9];									//ÁĞ×´Ì¬
-int statusV[9];									//ĞĞ×´Ì¬
-int statusB[9];									//¾Å¹¬¸ñ×´Ì¬
+int statusH[9];									//åˆ—çŠ¶æ€
+int statusV[9];									//è¡ŒçŠ¶æ€
+int statusB[9];									//ä¹å®«æ ¼çŠ¶æ€
 
 bool test = false;
 
@@ -36,8 +36,8 @@ bool test = false;
 //
 //	printf("------------------\n");
 //	printSudoku(sudoku);
-//	init();                                     // ³õÊ¼Éè¶¨
-//	tryAns2();                                   // ²âÊÔÇó½â
+//	init();                                     // åˆå§‹è®¾å®š
+//	tryAns2();                                   // æµ‹è¯•æ±‚è§£
 //	printf("------------------\n");
 //	printSudoku(sudoku);
 //	printf("------------------\n");
@@ -47,7 +47,7 @@ bool test = false;
 //}
 
 int init() {
-	//³õÊ¼×´Ì¬Öµ
+	//åˆå§‹çŠ¶æ€å€¼
 	for (int i = 0; i < 9; ++i)
 	{
 		statusH[i] = 0;
@@ -56,10 +56,10 @@ int init() {
 	}
 
 	for (int i = 0; i < 81; i++) {
-		int indexH = i % 9;      					//µÚ¼¸ÁĞ£¬Ò²ÊÇĞĞÎ»ÖÃ
-		int indexV = i / 9;							//µÚ¼¸ĞĞ£¬Ò²ÊÇÁĞÎ»ÖÃ
-		int indexB = ((i / 9) / 3) * 3 + (i % 9) / 3;			//¾Å¹¬¸ñË÷Òı
-																// int stationB=((i/9)%3)*3+(i%9)%3;		//¾Å¹¬¸ñÎ»ÖÃ
+		int indexH = i % 9;      					//ç¬¬å‡ åˆ—ï¼Œä¹Ÿæ˜¯è¡Œä½ç½®
+		int indexV = i / 9;							//ç¬¬å‡ è¡Œï¼Œä¹Ÿæ˜¯åˆ—ä½ç½®
+		int indexB = ((i / 9) / 3) * 3 + (i % 9) / 3;			//ä¹å®«æ ¼ç´¢å¼•
+																// int stationB=((i/9)%3)*3+(i%9)%3;		//ä¹å®«æ ¼ä½ç½®
 		if (sudoku[i] > 0)
 		{
 			int number = sudoku[i];
@@ -70,7 +70,7 @@ int init() {
 }
 
 int printSudoku(int *prn) {
-	// Ó¡³ö”µªšî}Ä¿(ê‡ÁĞƒÈÈİ)
+	// å°å‡ºæ•¸ç¨é¡Œç›®(é™£åˆ—å…§å®¹)
 	for (int i = 0; i < 81; i++) {
 		printf("%2d", prn[i]);
 		if (i % 9 == 8) printf("\n");
@@ -79,22 +79,22 @@ int printSudoku(int *prn) {
 }
 
 int tryAns2() {
-	int sp = getNextBlank(-1);                    // È¡µÃµÚÒ»‚€¿Õ°×µÄÎ»ÖÃé_Ê¼ÌîÈë”µ×Ö
+	int sp = getNextBlank(-1);                    // å–å¾—ç¬¬ä¸€å€‹ç©ºç™½çš„ä½ç½®é–‹å§‹å¡«å…¥æ•¸å­—
 
 	do {
-		int indexH = sp % 9;      					//µÚ¼¸ÁĞ£¬Ò²ÊÇĞĞÎ»ÖÃ
-		int indexV = sp / 9;						//µÚ¼¸ĞĞ£¬Ò²ÊÇÁĞÎ»ÖÃ
-		int indexB = ((sp / 9) / 3) * 3 + (sp % 9) / 3;		//¾Å¹¬¸ñË÷Òı
+		int indexH = sp % 9;      					//ç¬¬å‡ åˆ—ï¼Œä¹Ÿæ˜¯è¡Œä½ç½®
+		int indexV = sp / 9;						//ç¬¬å‡ è¡Œï¼Œä¹Ÿæ˜¯åˆ—ä½ç½®
+		int indexB = ((sp / 9) / 3) * 3 + (sp % 9) / 3;		//ä¹å®«æ ¼ç´¢å¼•
 
-		int skipValue = sudoku[sp];				// ÉÏÒ»¸öÎ»ÖÃ´æÔÚÊı¾İ£¬ÔòÖØÖÃ×´Ì¬Êı¾İ
+		int skipValue = sudoku[sp];				// ä¸Šä¸€ä¸ªä½ç½®å­˜åœ¨æ•°æ®ï¼Œåˆ™é‡ç½®çŠ¶æ€æ•°æ®
 		resetStatus(indexV, indexH, indexB, skipValue);
 
-		//ËÑË÷Ò»¸öĞÂÊı
+		//æœç´¢ä¸€ä¸ªæ–°æ•°
 		int number = findNumber(indexV, indexH, indexB, skipValue);
-		//µ±Ç°Êı¶ÀÎŞ·¨½øĞĞÁË£¬ĞèÒª»ØËİÒ»ÏÂ
+		//å½“å‰æ•°ç‹¬æ— æ³•è¿›è¡Œäº†ï¼Œéœ€è¦å›æº¯ä¸€ä¸‹
 		if (number == -1)
 		{
-			//»ØËİÉÏÒ»¸öÎ»ÖÃ
+			//å›æº¯ä¸Šä¸€ä¸ªä½ç½®
 			sudoku[sp] = 0;
 			sp = pop();
 			if (sp == -1)
@@ -106,7 +106,7 @@ int tryAns2() {
 		}
 
 		sudoku[sp] = number;
-		// ±ê¼Ç×´Ì¬
+		// æ ‡è®°çŠ¶æ€
 		markStatus(indexV, indexH, indexB, number);
 		push(sp);
 		sp = getNextBlank(sp);
@@ -116,12 +116,12 @@ int tryAns2() {
 
 
 int findNumber(int indexV, int indexH, int indexB, int skipValue) {
-	//»ñÈ¡Í¬ĞĞ¡¢ÁĞ¡¢¾ÅŒm¸ñ›]ÓĞÓÃµ½µÄÊı×Ö
+	//è·å–åŒè¡Œã€åˆ—ã€ä¹å®®æ ¼æ²’æœ‰ç”¨åˆ°çš„æ•°å­—
 	int status = statusV[indexV] | statusH[indexH] | statusB[indexB];
-	//±£Ö¤´Ó×îĞ¡¿ÉËÑË÷·¶Î§²éÕÒ,²¢ÇÒ±£Ö¤ÉÏÒ»´Î³öÏÖ¹ıµÄ²»ÔÙËÑË÷
+	//ä¿è¯ä»æœ€å°å¯æœç´¢èŒƒå›´æŸ¥æ‰¾,å¹¶ä¸”ä¿è¯ä¸Šä¸€æ¬¡å‡ºç°è¿‡çš„ä¸å†æœç´¢
 	if (skipValue > 0)
 	{
-		//°ÑÄ©kÎ»±ä³É1
+		//æŠŠæœ«kä½å˜æˆ1
 		status = status | ((1 << skipValue) - 1);
 	}
 
@@ -130,11 +130,11 @@ int findNumber(int indexV, int indexH, int indexB, int skipValue) {
 		return -1;
 	}
 
-	//°ÑÓÒÆğµÚÒ»¸ö0±ä³É1
+	//æŠŠå³èµ·ç¬¬ä¸€ä¸ª0å˜æˆ1
 	int nextStatus = status | (status + 1);
-	//»ñÈ¡²îÖµ
+	//è·å–å·®å€¼
 	int difValue = nextStatus^status;
-	//»ñÈ¡logn
+	//è·å–logn
 	for (int i = 0; i < 9; ++i)
 	{
 		if ((difValue >> i) == 1)
@@ -145,46 +145,46 @@ int findNumber(int indexV, int indexH, int indexB, int skipValue) {
 }
 
 int getNextBlank(int sp) {
-	// È¡µÃÏÂÒ»‚€¿Õ°×µÄÎ»ÖÃ
+	// å–å¾—ä¸‹ä¸€å€‹ç©ºç™½çš„ä½ç½®
 	do {
 		sp++;
 	} while (sp < 81 && sudoku[sp]>0);
 	return(sp);
 }
 
-// sp ÊÇµ±Ç°Î»ÖÃË÷Òı£¬indexV ĞĞË÷Òı£¬indexH ÁĞË÷Òı£¬indexB¾Å¹¬¸ñË÷Òı
+// sp æ˜¯å½“å‰ä½ç½®ç´¢å¼•ï¼ŒindexV è¡Œç´¢å¼•ï¼ŒindexH åˆ—ç´¢å¼•ï¼ŒindexBä¹å®«æ ¼ç´¢å¼•
 int check(int sp, int indexV, int indexH, int indexB) {
-	// ¼ì²éÍ¬ĞĞ¡¢ÁĞ¡¢¾ÅŒm¸ñ›]ÓĞÓÃµ½µÄÊı×Ö£¬ÈôÒÑ¾­ÓÃ¹ı·µ»Ø 1
+	// æ£€æŸ¥åŒè¡Œã€åˆ—ã€ä¹å®®æ ¼æ²’æœ‰ç”¨åˆ°çš„æ•°å­—ï¼Œè‹¥å·²ç»ç”¨è¿‡è¿”å› 1
 	int status = statusV[indexV] | statusH[indexH] | statusB[indexB];
-	//9¸öÊı×Ö¶¼±»ÓÃÁË
+	//9ä¸ªæ•°å­—éƒ½è¢«ç”¨äº†
 	if (status >= STATUS_MAX_VALUE)
 	{
 		return 1;
 	}
 	int number = sudoku[sp];
-	//È¡ÓÒÊıµÚkÎ»,ÈôÊÇ1±íÃ÷Õâ¸öÖµÒÑ¾­´æÔÚÁË
+	//å–å³æ•°ç¬¬kä½,è‹¥æ˜¯1è¡¨æ˜è¿™ä¸ªå€¼å·²ç»å­˜åœ¨äº†
 	return status >> (number - 1) & 1;
 }
 
 int push(int sp) {
-	// Œ¢Ö¸¶¨µÄÎ»ÖÃ·ÅÈë¶Ñ¯BÖĞ
+	// å°‡æŒ‡å®šçš„ä½ç½®æ”¾å…¥å †ç–Šä¸­
 	tempNum[tempSp++] = sp;
 	return 0;
 }
 
 int pop() {
-	// È¡³ö¶Ñ¯BÖĞµÄÉÏÒ»‚€Î»ÖÃ
+	// å–å‡ºå †ç–Šä¸­çš„ä¸Šä¸€å€‹ä½ç½®
 	if (tempSp <= 0) return(-1);
 	else return(tempNum[--tempSp]);
 }
 
-// ĞĞ¡¢ÁĞ¡¢¹¬¶ş½øÖÆÊı¾İÖ¸¶¨Î»ÖÃ±ê¼ÇÎª1
+// è¡Œã€åˆ—ã€å®«äºŒè¿›åˆ¶æ•°æ®æŒ‡å®šä½ç½®æ ‡è®°ä¸º1
 int markStatus(int indexV, int indexH, int indexB, int number) {
 	if (number < 1)
 	{
 		return 0;
 	}
-	//°ÑÓÒÊıµÚk(´Ó1¼ÆÊı)Î»±ä³É1 
+	//æŠŠå³æ•°ç¬¬k(ä»1è®¡æ•°)ä½å˜æˆ1 
 	statusV[indexV] |= (1 << (number - 1));
 	statusH[indexH] |= (1 << (number - 1));
 	statusB[indexB] |= (1 << (number - 1));
@@ -195,7 +195,7 @@ int resetStatus(int indexV, int indexH, int indexB, int number) {
 	{
 		return 0;
 	}
-	//°ÑÓÒÊıµÚkÎ»±ä³É0 
+	//æŠŠå³æ•°ç¬¬kä½å˜æˆ0 
 	statusV[indexV] &= ~(1 << (number - 1));
 	statusH[indexH] &= ~(1 << (number - 1));
 	statusB[indexB] &= ~(1 << (number - 1));
