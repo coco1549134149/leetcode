@@ -1,4 +1,5 @@
 #!/bin/bash
+
 echo "=== Git 远程仓库检查 ==="
 git remote -v
 
